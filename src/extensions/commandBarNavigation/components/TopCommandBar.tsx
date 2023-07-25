@@ -5,31 +5,40 @@ import { Panel } from '@fluentui/react/lib/Panel';
 import styles from './TopCommandBar.module.scss';
 import { ITopCommandBarProps } from "./ITopCommandBarProps";
 import { IMenuItem } from "../../../models/IMenuItem";
+import GraphService from "../../../services/GraphService";
 import { SPService } from "../../../services/SPService";
 import { evaluateCommandItems, evaluateFarItems } from "../../../services/MenuItemsService";
 import { ListPermissions } from "./permissions/ListPermissions";
 
-
 export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
-  const [teamsites, setTeamsites] = React.useState<IMenuItem[]>();
-  const [commsites, setCommsites] = React.useState<IMenuItem[]>();
+  const [teamsites, setTeamsites] = React.useState<IMenuItem[]>([]);
+  const [commsites, setCommsites] = React.useState<IMenuItem[]>([]);
+  const [teams, setTeams] = React.useState<IMenuItem[]>([]);
   const [externalSharingEnabled, setExternalSharingEnabled] = React.useState<boolean>(false);
   const [commandItems, setCommandItems] = React.useState<IContextualMenuItem[]>([]);
   const [farItems, setFarItems] = React.useState<IContextualMenuItem[]>([]);
   const [permissionPanelOpen, setPermissionPanelOpen] = React.useState<boolean>(false);
   const spService = new SPService(props.serviceScope);
+  const graphService = new GraphService(props.serviceScope);
 
   const getTeamsites = () => { 
     spService.readTeamsites("", 0, props.currentSiteUrl) 
       .then((response: IMenuItem[]) => {
         setTeamsites(response);                   
       });        
-  }
+  };
 
   const getCommsites = () => {    
     spService.readCommsites("", 0, props.currentSiteUrl) 
       .then((response: IMenuItem[]) => {
         setCommsites(response);                   
+      });        
+  };
+
+  const getTeams = () => { 
+    graphService.getTopTeams() 
+      .then((response: IMenuItem[]) => {
+        setTeams(response);                   
       });        
   };
 
@@ -41,9 +50,9 @@ export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
   };
 
   React.useEffect((): void => {
-    const renderedItems = evaluateCommandItems(teamsites!, commsites!);
+    const renderedItems = evaluateCommandItems(teamsites, commsites, teams);
     setCommandItems(renderedItems);    
-  }, [teamsites, commsites]);
+  }, [teamsites, commsites, teams]);
 
   React.useEffect((): void => {
     const rightItems = evaluateFarItems(externalSharingEnabled, togglePermissions);
@@ -53,6 +62,7 @@ export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
   React.useEffect((): void => {
     getTeamsites();
     getCommsites();
+    getTeams();
     evalSharing();
   }, []);
 

@@ -90,6 +90,23 @@ export class SPService implements ISPService {
       });
   }
 
+  public async getSitePermissions(currentSiteUrl: string) {
+    this.currentSiteUrl = currentSiteUrl;
+    const requestUrl = this.currentSiteUrl + '/_api/web/roleassignments?$expand=Member/users,RoleDefinitionBindings';
+    return this._spHttpClient.get(requestUrl, SPHttpClient.configurations.v1)
+      .then((response: SPHttpClientResponse) => {
+        return response.json();
+      })
+      .then((jsonResponse: any) => {
+        const permissionItems: IPermissionItem[] = [];
+        // jsonResponse.value.forEach((l: any) => {
+        //   permissionItems.push({ key: l.Id, name: l.Title, permission: l.HasUniqueRoleAssignments ? 'Unique':'Inherits', description: '', url: l.RootFolder.ServerRelativeUrl });
+        // });
+        console.log(jsonResponse.value);
+        return permissionItems;
+      });
+  }
+
   public async evalSiteListsPermInheritance(currentSiteUrl: string): Promise<IPermissionItem[]> {
     this.currentSiteUrl = currentSiteUrl;
     const requestUrl = this.currentSiteUrl + '/_api/web/lists?$select=HasUniqueRoleAssignments,Title,Id,BaseTemplate,RootFolder/ServerRelativeUrl&$expand=RootFolder&$filter=BaseTemplate eq 101 or BaseTemplate eq 100';

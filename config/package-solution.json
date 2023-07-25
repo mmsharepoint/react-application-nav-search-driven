@@ -8,7 +8,7 @@
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
     "developer": {
-      "name": "",
+      "name": "Markus Moeller",
       "websiteUrl": "",
       "privacyUrl": "",
       "termsOfUseUrl": "",
@@ -37,6 +37,12 @@
             "ClientSideInstance.xml"
           ]
         }
+      }
+    ], 
+    "webApiPermissionRequests": [
+      {
+        "resource": "Microsoft Graph",
+        "scope": "Group.Read.All"
       }
     ]
   },

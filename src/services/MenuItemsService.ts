@@ -61,6 +61,27 @@ const teamSitesItem: ICommandBarItemProps = {
     }
   };
 
+  const myTeamsItem: ICommandBarItemProps = {
+    key: 'Myteams',
+    name: 'My Teams',
+    className: `ms-CommandBarItem`,
+    iconProps: {
+      iconName: 'TeamsLogo'
+    },
+    subMenuProps: {
+      items: [{
+        key: 'Myteams',
+        name: 'Myteams',
+        label: 'My Teams',        
+        dataItems: [],
+        // searchCallback: searchMyTeams,
+        onRender: renderSubmenu
+      }],
+      onDismiss: dismissProjects,
+      onItemClick: closeMenu
+    }
+  };
+
   const externalSharingItem: ICommandBarItemProps = {
     key: 'ExtNo',
     title : '',
@@ -87,9 +108,10 @@ const teamSitesItem: ICommandBarItemProps = {
     name: 'List Permissions',
   };
 
-  export const evaluateCommandItems = (teamsites: IMenuItem[], commsites: IMenuItem[]): ICommandBarItemProps[] => {    
+  export const evaluateCommandItems = (teamsites: IMenuItem[], commsites: IMenuItem[], myTeams: IMenuItem[]): ICommandBarItemProps[] => {    
     teamSitesItem.subMenuProps!.items[0].dataItems = teamsites;
     commSitesItem.subMenuProps!.items[0].dataItems = commsites;
+    myTeamsItem.subMenuProps!.items[0].dataItems = myTeams;
     let commandBarItems: ICommandBarItemProps[] = [];
     // if (this.useTeamsites) {      
       commandBarItems.push(teamSitesItem);
@@ -97,7 +119,8 @@ const teamSitesItem: ICommandBarItemProps = {
     // if (this.useCommsites) {      
       commandBarItems.push(commSitesItem);
     // }
-    
+    commandBarItems.push(myTeamsItem);
+
     return commandBarItems;
   }
 

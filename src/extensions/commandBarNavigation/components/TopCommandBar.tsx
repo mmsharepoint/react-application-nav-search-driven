@@ -2,6 +2,7 @@ import * as React from "react";
 import { CommandBar } from '@fluentui/react/lib/CommandBar';
 import { IContextualMenuItem } from '@fluentui/react/lib/ContextualMenu';
 import { Panel } from '@fluentui/react/lib/Panel';
+import { Pivot, PivotItem } from '@fluentui/react/lib/Pivot';
 import styles from './TopCommandBar.module.scss';
 import { ITopCommandBarProps } from "./ITopCommandBarProps";
 import { IMenuItem } from "../../../models/IMenuItem";
@@ -9,6 +10,7 @@ import GraphService from "../../../services/GraphService";
 import { SPService } from "../../../services/SPService";
 import { evaluateCommandItems, evaluateFarItems } from "../../../services/MenuItemsService";
 import { ListPermissions } from "./permissions/ListPermissions";
+import { SitePermissions } from "./permissions/SitePermissions";
 
 export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
   const [teamsites, setTeamsites] = React.useState<IMenuItem[]>([]);
@@ -83,7 +85,20 @@ export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
           onDismiss={togglePermissions}
           closeButtonAriaLabel="Close"
         >
-        <ListPermissions serviceScope={props.serviceScope} currentSiteUrl={props.currentSiteUrl} />
+        <Pivot aria-label="Basic Pivot Example">
+          <PivotItem
+            headerText="Site"
+            headerButtonProps={{
+              'data-order': 1,
+              'data-title': 'My Files Title',
+            }}
+          >
+            <SitePermissions serviceScope={props.serviceScope} currentSiteUrl={props.currentSiteUrl} />
+          </PivotItem>
+          <PivotItem headerText="Lists">
+            <ListPermissions serviceScope={props.serviceScope} currentSiteUrl={props.currentSiteUrl} />
+          </PivotItem>      
+        </Pivot>        
       </Panel>
     </div>
   );

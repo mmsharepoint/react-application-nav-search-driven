@@ -2,16 +2,17 @@ import * as React from "react";
 import { List } from '@fluentui/react/lib/List';
 import { SPService } from "../../../../services/SPService";
 import { IPermissionItem } from "../../../../models/IPermissionItem";
-import styles from './ListPermissions.module.scss';
-import { IListPermissionsProps } from "./IListPermissionsProps";
+import styles from './SitePermissions.module.scss';
+import { ISitePermissionsProps } from "./ISitePermissionsProps";
 
-export const ListPermissions: React.FC<IListPermissionsProps> = (props) => {
+export const SitePermissions: React.FC<ISitePermissionsProps> = (props) => {
   const [items, setItems] = React.useState<IPermissionItem[]>([]);
   const spService = new SPService(props.serviceScope);
   
-  const evalListPermissions = () => {
-    spService.evalSiteListsPermInheritance(props.currentSiteUrl)
+  const evalSitePermissions = () => {
+    spService.getSitePermissions(props.currentSiteUrl)
       .then((respItems) => {
+        console.log(respItems);
         setItems(respItems);
       });
   };
@@ -28,12 +29,12 @@ export const ListPermissions: React.FC<IListPermissionsProps> = (props) => {
   };
 
   React.useEffect((): void => {
-    evalListPermissions();
+    evalSitePermissions();
   }, []);
 
   return (
-    <div className={styles.listPermissions}>
-      <h4>Lists</h4>
+    <div className={styles.sitePermissions}>
+      <h4>Site</h4>
       <List items={items} onRenderCell={onRenderCell} />
     </div>
   )

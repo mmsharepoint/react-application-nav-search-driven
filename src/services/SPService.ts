@@ -99,9 +99,9 @@ export class SPService implements ISPService {
       })
       .then((jsonResponse: any) => {
         const permissionItems: IPermissionItem[] = [];
-        // jsonResponse.value.forEach((l: any) => {
-        //   permissionItems.push({ key: l.Id, name: l.Title, permission: l.HasUniqueRoleAssignments ? 'Unique':'Inherits', description: '', url: l.RootFolder.ServerRelativeUrl });
-        // });
+        jsonResponse.value.forEach((l: any) => {
+          permissionItems.push({ key: l.PrincipalId, name: l.Member.Title, permission: l.RoleDefinitionBindings[0].Name, description: l.RoleDefinitionBindings[0].Description, url: this.currentSiteUrl + `/_layouts/15/people.aspx?MembershipGroupId=${l.PrincipalId}` });
+        });
         console.log(jsonResponse.value);
         return permissionItems;
       });

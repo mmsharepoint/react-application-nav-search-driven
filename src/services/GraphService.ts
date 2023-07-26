@@ -16,6 +16,63 @@ export default class GraphService {
     });
   }
 
+  public async readTeamsites(searchText: string, start: number): Promise<IMenuItem[]> {
+    let queryText = `WebTemplate:Group`;
+    if (searchText !== null && searchText !== '') {
+      queryText += ` AND ${searchText}`;
+    }
+    const searchResponse = await this.searchSites(queryText, start);    
+    return this.transformSearchSites(searchResponse);
+  }
+
+  public async readCommsites(searchText: string, start: number): Promise<IMenuItem[]> {
+    let queryText = `WebTemplate:SITEPAGEPUBLISHING`;
+    if (searchText !== null && searchText !== '') {
+      queryText += ` AND ${searchText}`;
+    }
+    const searchResponse = await this.searchSites(queryText, start);    
+    return this.transformSearchSites(searchResponse);
+  }
+
+  private async searchSites(queryText: string, start: number): Promise<any> {
+    this.client = await this.msGraphClientFactory.getClient('3');
+    const reqeustBody = {
+      requests: [
+          {
+              entityTypes: [
+                  "site"
+              ],
+              query: {
+                  "queryString": `${queryText}`
+              }
+          }
+      ]
+    };
+
+    const response = await this.client
+            .api(`search/query`)
+            .version('v1.0')
+            .skip(start)
+            .top(20)   // Limit in batching!      
+            .post(reqeustBody);
+    return response.value[0].hitsContainers[0].hits;
+  }
+
+  private transformSearchSites(response: any[]): IMenuItem[] {    
+    const items: Array<IMenuItem> = new Array<IMenuItem>();
+    if (response !== null && response.length > 0) {
+      response.forEach((r: any) => {          
+        items.push({ displayName: r.resource.displayName, url: r.resource.webUrl, iconUrl: '', description: r.resource.description, key: r.resource.id });        
+      });
+      console.log(response);
+      console.log(items);
+      return items;
+    }
+    else {
+      return [];
+    }
+  }
+
   public async getTopTeams(): Promise<IMenuItem[]> {
     const rawTeams = await this.getTeams();
     const teamsMenuItems = await this.transformTeams(rawTeams);

@@ -4,8 +4,8 @@ import styles from './SiteIcon.module.scss';
 import { ISiteIconProps } from './ISiteIconProps';
 
 export const SiteIcon: React.FC<ISiteIconProps> = (props) => {
-  let iconColor: string;
-  let iconAcronym: string;
+  let iconColor: string = '';
+  let iconAcronym: string = '';
 
   /**
    * This function generates an acronym for a site title by

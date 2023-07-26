@@ -74,6 +74,7 @@ export default class CommandBarNavigationApplicationCustomizer
             currentSiteUrl: this.context.pageContext.site.absoluteUrl,
             serviceScope: this.context.serviceScope,
             msGraphClientFactory: this.context.msGraphClientFactory,
+            useGraph: true,               // ToDo
             useTeamsites: this.properties.useTeamsites,
             useCommsites: this.properties.useCommsites,
             // useClassicsites: this.properties.useClassicsites,

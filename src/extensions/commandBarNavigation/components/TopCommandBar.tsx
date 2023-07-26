@@ -23,18 +23,31 @@ export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
   const spService = new SPService(props.serviceScope);
   const graphService = new GraphService(props.serviceScope);
 
-  const getTeamsites = () => { 
-    spService.readTeamsites("", 0, props.currentSiteUrl) 
-      .then((response: IMenuItem[]) => {
+  const getTeamsites = () => {
+    if (props.useGraph) {
+      graphService.readTeamsites('', 0).then((response: IMenuItem[]) => {
         setTeamsites(response);                   
-      });        
+      });;
+    }
+    else {
+      spService.readTeamsites("", 0, props.currentSiteUrl).then((response: IMenuItem[]) => {
+        setTeamsites(response);                   
+      });
+    }
   };
 
-  const getCommsites = () => {    
-    spService.readCommsites("", 0, props.currentSiteUrl) 
-      .then((response: IMenuItem[]) => {
+  const getCommsites = () => {
+    if (props.useGraph) {
+      graphService.readCommsites('', 0).then((response: IMenuItem[]) => {
         setCommsites(response);                   
-      });        
+      });;
+    }
+    else {
+      spService.readCommsites("", 0, props.currentSiteUrl) 
+        .then((response: IMenuItem[]) => {
+          setCommsites(response);                   
+        });
+    }    
   };
 
   const getTeams = () => { 

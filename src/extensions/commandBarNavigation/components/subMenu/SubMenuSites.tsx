@@ -11,9 +11,9 @@ export const SubMenuSites: React.FC<ISubMenuSitesProps> = (props) => {
       return (<li className={styles.menuListItem}>
                 <SiteIcon
                   siteTitle={item.displayName}
-                  iconAcronym={item.iconAcronym!}
-                  iconColor={item.iconColor!}
-                  iconUrl={item.iconUrl!} />
+                  iconAcronym={item.iconAcronym?item.iconAcronym:''}
+                  iconColor={item.iconColor?item.iconColor:''}
+                  iconUrl={item.iconUrl?item.iconUrl:''} />
                 <a className="ms-fontColor-neutralPrimary ms-fontColor-themePrimary--hover" onClick={() => window.open(item.url , '_self')} >{item.displayName}</a>
               </li>);
     });

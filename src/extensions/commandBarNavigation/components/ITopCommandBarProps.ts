@@ -5,6 +5,7 @@ export interface ITopCommandBarProps {
   currentSiteUrl: string;
   serviceScope: ServiceScope;
   msGraphClientFactory: MSGraphClientFactory;
+  useGraph: boolean;
   useTeamsites: boolean;
   useCommsites: boolean;
 }

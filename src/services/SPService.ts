@@ -90,7 +90,7 @@ export class SPService implements ISPService {
       });
   }
 
-  public async getSitePermissions(currentSiteUrl: string) {
+  public async getSitePermissions(currentSiteUrl: string): Promise<IPermissionItem[]> {
     this.currentSiteUrl = currentSiteUrl;
     const requestUrl = this.currentSiteUrl + '/_api/web/roleassignments?$expand=Member/users,RoleDefinitionBindings';
     return this._spHttpClient.get(requestUrl, SPHttpClient.configurations.v1)
@@ -121,5 +121,41 @@ export class SPService implements ISPService {
         });
         return permissionItems;
       });
+  }
+
+  public async breakInheritListPermissions(currentSiteUrl: string, listID: string): Promise<boolean> {
+    this.currentSiteUrl = currentSiteUrl;
+    const requestUrl = this.currentSiteUrl + `/_api/web/lists(guid'${listID}')/breakroleinheritance(copyRoleAssignments=true, clearSubscopes=true)`;
+    return this._spHttpClient.post(requestUrl, SPHttpClient.configurations.v1, {})
+    .then((response: SPHttpClientResponse) => {
+      if (response.ok) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    })
+    .catch((err: any) => {
+      console.log(err);
+      return false;
+    });
+  }
+
+  public async reInheritListPermissions(currentSiteUrl: string, listID: string): Promise<boolean> {
+    this.currentSiteUrl = currentSiteUrl;
+    const requestUrl = this.currentSiteUrl + `/_api/web/lists(guid'${listID}')/ResetRoleInheritance()`;
+    return this._spHttpClient.post(requestUrl, SPHttpClient.configurations.v1, {})
+    .then((response: SPHttpClientResponse) => {
+      if (response.ok) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    })
+    .catch((err: any) => {
+      console.log(err);
+      return false;
+    });
   }
 }

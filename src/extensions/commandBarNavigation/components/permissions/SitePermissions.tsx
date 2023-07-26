@@ -17,7 +17,7 @@ export const SitePermissions: React.FC<ISitePermissionsProps> = (props) => {
       });
   };
 
-  const onRenderCell = (item: IPermissionItem, index: number | undefined): JSX.Element => {
+  const onRenderCell = (item: IPermissionItem, index: number): JSX.Element => {
     return (
       <div data-is-focusable={true}>       
         <div className={index! % 2 === 0 ? styles.evenRow : styles.oddRow}>

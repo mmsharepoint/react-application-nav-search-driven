@@ -1,9 +1,11 @@
 .listPermissions {
     .oddRow {
         background-color: "[theme: neutralQuarternary, default: #d0d0d0]";
+        padding: 4px;
     }
     .evenRow {
         background-color: inherit;
+        padding: 4px;
     }
     .itemName {
         white-space: nowrap;
@@ -14,9 +16,13 @@
             color: "[theme: neutralPrimary, default: #333333]";
         }        
     }
-    .itemIndex {
+    .itemPermission {
         font-size: smaller;
-        margin-bottom: 10;
+        display: flex;
+        justify-content: space-between;
         color: "[theme: neutralSecondary, default: #666666]";
+    }
+    .txtPermission {
+        margin-top: 8px;
     }
 }

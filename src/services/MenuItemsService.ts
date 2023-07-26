@@ -15,7 +15,7 @@ const dismissProjects = () => {
   // What if submenu gets closed?
 }
 
-const closeMenu = () => {
+const closeMenu = (): boolean => {
   return true;
 }
 
@@ -112,7 +112,7 @@ const teamSitesItem: ICommandBarItemProps = {
     teamSitesItem.subMenuProps!.items[0].dataItems = teamsites;
     commSitesItem.subMenuProps!.items[0].dataItems = commsites;
     myTeamsItem.subMenuProps!.items[0].dataItems = myTeams;
-    let commandBarItems: ICommandBarItemProps[] = [];
+    const commandBarItems: ICommandBarItemProps[] = [];
     // if (this.useTeamsites) {      
       commandBarItems.push(teamSitesItem);
     // }
@@ -125,7 +125,7 @@ const teamSitesItem: ICommandBarItemProps = {
   }
 
   export const evaluateFarItems = (externalSharingEnabled: boolean, showPermissions: () => void): ICommandBarItemProps[] => {
-    let farItems: ICommandBarItemProps[] = [];
+    const farItems: ICommandBarItemProps[] = [];
     if (externalSharingEnabled !== null) {
       if (externalSharingEnabled) {
         externalSharingItem.title = 'External Sharing enabled';

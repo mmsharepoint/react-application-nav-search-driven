@@ -15,7 +15,7 @@ export const SiteIcon: React.FC<ISiteIconProps> = (props) => {
    */
   const generateSiteAcronym = (): string => {
     let acronym: string = '';
-    let siteTitleWords: string[] = props.siteTitle.split(' ');
+    const siteTitleWords: string[] = props.siteTitle.split(' ');
     if (siteTitleWords.length > 1) {
       acronym = siteTitleWords[0].substring(0, 1) + siteTitleWords[1].substring(0, 1);
     }
@@ -28,14 +28,14 @@ export const SiteIcon: React.FC<ISiteIconProps> = (props) => {
 
   const generateRandomColor = (): string => {
     let color: string = '';
-    let colorCode = Math.floor((Math.random() * 15)); // PersonaInitialsColor 0-14
+    const colorCode = Math.floor((Math.random() * 15)); // PersonaInitialsColor 0-14
     color = PersonaInitialsColor[colorCode];
     return color;
   }
 
-  if ((props.iconUrl == null || props.iconUrl == '') && 
-        (props.iconAcronym == null || props.iconAcronym == '') &&
-        (props.iconColor == null || props.iconColor == '')) {
+  if ((props.iconUrl === null || props.iconUrl === '') && 
+        (props.iconAcronym === null || props.iconAcronym === '') &&
+        (props.iconColor === null || props.iconColor === '')) {
     iconColor = generateRandomColor();
     iconAcronym = generateSiteAcronym();
   }

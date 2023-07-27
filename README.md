@@ -8,6 +8,8 @@ Menu live in action inside a Communication site
 
 ![App live in action inside Teams](assets/01MenuInAction.gif)
 
+For further details see the author's [blog post](https://mmsharepoint.wordpress.com/2023/07/27/a-search-driven-navigation-with-sharepoint-framework-spfx-extension-and-fluentui/)
+
 ## Used SharePoint Framework Version
 
 ![version](https://img.shields.io/badge/version-1.17.4-green.svg)
@@ -23,7 +25,7 @@ Menu live in action inside a Communication site
 
 Version|Date|Author|Comments
 -------|----|----|--------
-0.1|Jul XX, 2023|[Markus Moeller](https://twitter.com/moeller2_0)|Initial release
+0.1|Jul 27, 2023|[Markus Moeller](https://twitter.com/moeller2_0)|Initial release
 
 ## Disclaimer
 
@@ -37,9 +39,15 @@ Version|Date|Author|Comments
 - Ensure that you are at the solution folder
 - in the command-line run:
   - **npm install**
-  - **gulp serve**
+  - **gulp serve --nobrowser**
 
-> Include any additional steps as needed.
+- Open a SharePoint site of your choice
+- Attach the following to your site url:
+  ```
+  ?loadSPFX=true&debugManifestsFile=https://localhost:4321/temp/manifests.js&customActions={"315298b1-ad03-4730-8423-0a07941a96d9":{"location":"ClientSideExtension.ApplicationCustomizer","properties":{"useTeamsites":true,"useCommsites": true,"useHubsites": true,"useTeams": true,"useGraph": true}}}
+  ```
+- Confirm 'Load Debug Scripts'
+- Play around with the properties in above's url
 
 ## Features
 

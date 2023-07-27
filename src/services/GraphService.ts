@@ -30,7 +30,7 @@ export default class GraphService {
     if (searchText !== null && searchText !== '') {
       queryText += ` AND ${searchText}`;
     }
-    const searchResponse = await this.searchSites(queryText, start);    
+    const searchResponse = await this.searchSites(queryText, start);
     return this.transformSearchSites(searchResponse);
   }
 
@@ -45,7 +45,7 @@ export default class GraphService {
 
   private async searchSites(queryText: string, start: number): Promise<any> {
     this.client = await this.msGraphClientFactory.getClient('3');
-    const reqeustBody = {
+    const requestBody = {
       requests: [
           {
               entityTypes: [
@@ -63,7 +63,7 @@ export default class GraphService {
             .version('v1.0')
             .skip(start)
             .top(20)   // Limit in batching!      
-            .post(reqeustBody);
+            .post(requestBody);
     if (response.value[0].hitsContainers[0].total > 0) {
       return response.value[0].hitsContainers[0].hits;
     }
@@ -74,10 +74,8 @@ export default class GraphService {
     const items: Array<IMenuItem> = new Array<IMenuItem>();
     if (response !== null && response.length > 0) {
       response.forEach((r: any) => {          
-        items.push({ displayName: r.resource.displayName, url: r.resource.webUrl, iconUrl: '', description: r.resource.description, key: r.resource.id });        
+        items.push({ displayName: r.resource.displayName, url: r.resource.webUrl, iconUrl: '', description: r.resource.description, key: r.resource.id });
       });
-      console.log(response);
-      console.log(items);
       return items;
     }
     else {

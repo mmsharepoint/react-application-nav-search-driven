@@ -5,9 +5,8 @@ import { IMenuItem } from '../models/IMenuItem';
 import { SubMenuSites } from '../extensions/commandBarNavigation/components/subMenu/SubMenuSites';
 import { ISubMenuSitesProps } from '../extensions/commandBarNavigation/components/subMenu/ISubMenuSitesProps';
 
-
-const renderSubmenu = (item: any) => {    
-  let element: React.ReactElement<ISubMenuSitesProps> = React.createElement(SubMenuSites, item);    
+const renderSubmenu = (item: any) => {
+  let element: React.ReactElement<ISubMenuSitesProps> = React.createElement(SubMenuSites, item);
   return element;
 }
 
@@ -39,15 +38,15 @@ const teamSitesItem: ICommandBarItemProps = {
     items: [{
       key: 'Teamsites',
       name: 'Teamsites',   
-      label: 'Modern Teamsites',     
+      label: 'Modern Teamsites',
       dataItems: [],
       // searchCallback: this.searchTeamsites.bind(this),
       onRender: renderSubmenu
     }],
     onDismiss: dismissProjects,
-    onItemClick: closeMenu                
+    onItemClick: closeMenu
   }
-  };
+};
 
   const commSitesItem: ICommandBarItemProps = {
     key: 'Commsites',

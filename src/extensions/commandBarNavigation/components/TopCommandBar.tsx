@@ -130,7 +130,7 @@ export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
         className={styles.top}    
         items={ commandItems }
         farItems={ farItems }
-      />   
+      />
       <Panel
           headerText="Permissions"
           isOpen={permissionPanelOpen}

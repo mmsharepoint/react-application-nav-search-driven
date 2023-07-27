@@ -18,7 +18,6 @@ export class SPService implements ISPService {
   constructor(serviceScope: ServiceScope) {  
     serviceScope.whenFinished(() => {
       this._spHttpClient = serviceScope.consume(SPHttpClient.serviceKey);
-      // this.graphServiceInstance = serviceScope.consume(GraphService.serviceKey);
     });
   }
 
@@ -74,6 +73,36 @@ export class SPService implements ISPService {
     const searchResponse = await this.searchSites(queryText, start);
     return this.transformSearchSites(searchResponse);
   }
+  
+  public async readHubsites(searchText: string, start: number, currentSiteUrl: string): Promise<IMenuItem[]> {
+    let queryText = `contentclass:STS_Site AND IsHubSite:true`;
+    this.currentSiteUrl = currentSiteUrl;
+    if (searchText !== null && searchText !== '') {
+      queryText += ` AND ${searchText}`;
+    }
+    const searchResponse = await this.searchSites(queryText, start);
+    return this.transformSearchSites(searchResponse);
+  }
+  /**
+   * This function evaluates if the given site belongs to a hub site and if so returns the HubSiteId ales null
+   * @returns string|
+   */
+  public getHubSiteId(currentSiteUrl: string): Promise<string|null> {
+    const requestUrl = `${currentSiteUrl}/_api/site/HubSiteId`;
+    return this._spHttpClient.get(requestUrl, SPHttpClient.configurations.v1)
+      .then((response) => {
+        return response.json();
+      })
+      .then((jsonResponse: any): string|null => {
+        let hubSiteId: string = jsonResponse.value;
+        if (hubSiteId !== '00000000-0000-0000-0000-000000000000') {
+          return hubSiteId;
+        }
+        else {
+          return null;
+        }
+      });
+  };
 
   /**
    * This function evaluates if external sharing is enabled for the current site

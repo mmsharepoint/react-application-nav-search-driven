@@ -15,7 +15,10 @@ import { SitePermissions } from "./permissions/SitePermissions";
 export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
   const [teamsites, setTeamsites] = React.useState<IMenuItem[]>([]);
   const [commsites, setCommsites] = React.useState<IMenuItem[]>([]);
+  const [hubites, setHubsites] = React.useState<IMenuItem[]>([]);
   const [teams, setTeams] = React.useState<IMenuItem[]>([]);
+  const [hubsiteId, setHubsiteId] = React.useState<string|null>(null);
+  const [homesite, setHomesite] = React.useState<{url:string,displayName:string}|null>(null);
   const [externalSharingEnabled, setExternalSharingEnabled] = React.useState<boolean>(false);
   const [commandItems, setCommandItems] = React.useState<IContextualMenuItem[]>([]);
   const [farItems, setFarItems] = React.useState<IContextualMenuItem[]>([]);
@@ -45,9 +48,25 @@ export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
     else {
       spService.readCommsites("", 0, props.currentSiteUrl) 
         .then((response: IMenuItem[]) => {
-          setCommsites(response);                   
+          setCommsites(response);
         });
     }    
+  };
+
+  const getHubsites = () => {
+    spService.getHubSiteId(props.currentSiteUrl).then((response: string|null) => {
+      setHubsiteId(response);
+      if (props.useGraph) {
+        graphService.readHubsites('', 0).then((response: IMenuItem[]) => {
+          setHubsites(response);                   
+        });
+      }
+      else {
+        spService.readHubsites('', 0, props.currentSiteUrl).then((response: IMenuItem[]) => {
+          setHubsites(response);
+        });
+      }
+    });    
   };
 
   const getTeams = () => { 
@@ -65,19 +84,39 @@ export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
   };
 
   React.useEffect((): void => {
-    const renderedItems = evaluateCommandItems(teamsites, commsites, teams);
+    const renderedItems = evaluateCommandItems(teamsites, commsites, hubites, teams, homesite, props.useTeamsites, props.useCommsites, props.useHubsites, props.useTeams);
     setCommandItems(renderedItems);    
-  }, [teamsites, commsites, teams]);
+  }, [teamsites, commsites, hubites, teams, homesite]);
 
   React.useEffect((): void => {
     const rightItems = evaluateFarItems(externalSharingEnabled, togglePermissions);
     setFarItems(rightItems);
   }, [externalSharingEnabled]);
 
+  
   React.useEffect((): void => {
-    getTeamsites();
-    getCommsites();
-    getTeams();
+    if (props.useHubsites && hubsiteId !== null && hubites.length >0) {
+      hubites.forEach((h) => {
+        if (h.key.indexOf(hubsiteId) > -1) {
+          setHomesite({ url: h.url, displayName: h.displayName});
+        }
+      })
+    } 
+  }, [hubsiteId, hubites]);
+
+  React.useEffect((): void => {
+    if (props.useTeamsites) {
+      getTeamsites();
+    }
+    if (props.useCommsites) {
+      getCommsites();
+    }
+    if (props.useHubsites) {
+      getHubsites();
+    }
+    if (props.useTeams) {
+      getTeams();
+    }    
     evalSharing();
   }, []);
 

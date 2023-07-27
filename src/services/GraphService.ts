@@ -34,6 +34,15 @@ export default class GraphService {
     return this.transformSearchSites(searchResponse);
   }
 
+  public async readHubsites(searchText: string, start: number): Promise<IMenuItem[]> {
+    let queryText = `IsHubSite:true`;
+    if (searchText !== null && searchText !== '') {
+      queryText += ` AND ${searchText}`;
+    }
+    const searchResponse = await this.searchSites(queryText, start);    
+    return this.transformSearchSites(searchResponse);
+  }
+
   private async searchSites(queryText: string, start: number): Promise<any> {
     this.client = await this.msGraphClientFactory.getClient('3');
     const reqeustBody = {
@@ -55,7 +64,10 @@ export default class GraphService {
             .skip(start)
             .top(20)   // Limit in batching!      
             .post(reqeustBody);
-    return response.value[0].hitsContainers[0].hits;
+    if (response.value[0].hitsContainers[0].total > 0) {
+      return response.value[0].hitsContainers[0].hits;
+    }
+    else return [];
   }
 
   private transformSearchSites(response: any[]): IMenuItem[] {    

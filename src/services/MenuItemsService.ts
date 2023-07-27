@@ -18,6 +18,15 @@ const dismissProjects = () => {
 const closeMenu = (): boolean => {
   return true;
 }
+const homeSiteItem: ICommandBarItemProps = {
+  key: 'My Hub',
+  name: '',
+  className: `ms-CommandBarItem`,
+  href: '',
+  iconProps: {
+    iconName: 'Home'
+  }                
+};
 
 const teamSitesItem: ICommandBarItemProps = {
   key: 'Teamsites',
@@ -54,6 +63,27 @@ const teamSitesItem: ICommandBarItemProps = {
         label: 'Modern Communication Sites',       
         dataItems: [],
         //searchCallback: this.searchCommSites.bind(this),
+        onRender: renderSubmenu
+      }],
+      onDismiss: dismissProjects,
+      onItemClick: closeMenu                 
+    }
+  };
+
+  const hubSitesItem: ICommandBarItemProps = {
+    key: 'Hubsites',
+    name: 'Hub Sites',
+    className: `ms-CommandBarItem`,
+    iconProps: {
+      iconName: 'Org'
+    },
+    subMenuProps: {
+      items: [{
+        key: 'Hubsites',
+        name: 'Hubsites',   
+        label: 'Sites in Hub',     
+        dataItems: [],
+        // searchCallback: this.searchHubsites.bind(this),
         onRender: renderSubmenu
       }],
       onDismiss: dismissProjects,
@@ -108,18 +138,37 @@ const teamSitesItem: ICommandBarItemProps = {
     name: 'List Permissions',
   };
 
-  export const evaluateCommandItems = (teamsites: IMenuItem[], commsites: IMenuItem[], myTeams: IMenuItem[]): ICommandBarItemProps[] => {    
+  export const evaluateCommandItems = (teamsites: IMenuItem[], 
+                                        commsites: IMenuItem[], 
+                                        hubsites: IMenuItem[], 
+                                        myTeams: IMenuItem[],
+                                        homesite: any,
+                                        useTeamsites: boolean,
+                                        useCommsites: boolean,
+                                        useHubsites: boolean,
+                                        useTeams: boolean): ICommandBarItemProps[] => {    
     teamSitesItem.subMenuProps!.items[0].dataItems = teamsites;
     commSitesItem.subMenuProps!.items[0].dataItems = commsites;
+    hubSitesItem.subMenuProps!.items[0].dataItems = hubsites;
     myTeamsItem.subMenuProps!.items[0].dataItems = myTeams;
     const commandBarItems: ICommandBarItemProps[] = [];
-    // if (this.useTeamsites) {      
+    if (useHubsites && homesite !== null) {
+      homeSiteItem.href = homesite.url;
+      homeSiteItem.name = homesite.displayName;
+      commandBarItems.push(homeSiteItem);
+    }
+    if (useTeamsites) {      
       commandBarItems.push(teamSitesItem);
-    // }
-    // if (this.useCommsites) {      
+    }
+    if (useCommsites) {
       commandBarItems.push(commSitesItem);
-    // }
-    commandBarItems.push(myTeamsItem);
+    }
+    if (useHubsites) {
+      commandBarItems.push(hubSitesItem);
+    }
+    if (useTeams) {
+      commandBarItems.push(myTeamsItem);
+    }
 
     return commandBarItems;
   }

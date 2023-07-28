@@ -11,6 +11,7 @@ import { SPService } from "../../../services/SPService";
 import { evaluateCommandItems, evaluateFarItems } from "../../../services/MenuItemsService";
 import { ListPermissions } from "./permissions/ListPermissions";
 import { SitePermissions } from "./permissions/SitePermissions";
+import { SharingLinks } from "./permissions/SharingLinks";
 
 export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
   const [teamsites, setTeamsites] = React.useState<IMenuItem[]>([]);
@@ -149,6 +150,9 @@ export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
           </PivotItem>
           <PivotItem headerText="Lists">
             <ListPermissions serviceScope={props.serviceScope} currentSiteUrl={props.currentSiteUrl} />
+          </PivotItem>
+          <PivotItem headerText="Sharing Links">
+            <SharingLinks serviceScope={props.serviceScope} currentSiteUrl={props.currentSiteUrl} />
           </PivotItem>      
         </Pivot>        
       </Panel>

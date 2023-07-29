@@ -6,6 +6,7 @@ export interface ISharingLink {
     url: string;
     roleid: string;
     role?: string;
+    shareLink?: string;
     width?: number;
     height?: number;
 }

@@ -45,7 +45,7 @@ export default class CommandBarNavigationApplicationCustomizer
     return Promise.resolve();
   }
 
-  private renderGlobalNavigation() {
+  private renderGlobalNavigation(): void {
     if (!this._topPlaceholder) {
       this._topPlaceholder = this.context.placeholderProvider.tryCreateContent(PlaceholderName.Top, { onDispose: this._onDispose });
     
@@ -58,21 +58,19 @@ export default class CommandBarNavigationApplicationCustomizer
       }
       if (typeof this.properties.useCommsites !== 'boolean') {
         this.properties.useCommsites = true;
+      }      
+      if (typeof this.properties.useHubsites !== 'boolean') {
+        this.properties.useHubsites = true;
       }
-      // if (typeof this.properties.useClassicsites !== 'boolean') {
-      //   this.properties.useClassicsites = true;
-      // }
-      // if (typeof this.properties.useHubsites !== 'boolean') {
-      //   this.properties.useHubsites = true;
-      // }
-      // if (typeof this.properties.useTeams !== 'boolean') {
-      //   this.properties.useTeams = true;
-      // }
+      if (typeof this.properties.useTeams !== 'boolean') {
+        this.properties.useTeams = true;
+      }
       if (this._topPlaceholder && this._topPlaceholder.domElement) {
         const element: React.ReactElement<ITopCommandBarProps> = React.createElement(
           TopCommandBar,
           {
             currentSiteUrl: this.context.pageContext.site.absoluteUrl,
+            siteId: `${this.context.pageContext.site.id.toString()},${this.context.pageContext.web.id.toString()}`,
             serviceScope: this.context.serviceScope,
             msGraphClientFactory: this.context.msGraphClientFactory,
             useGraph: this.properties.useGraph,

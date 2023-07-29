@@ -4,6 +4,7 @@ import { ISharePointSearchResults, ISharePointSearchResultsTable } from "../mode
 import { IMenuItem } from "../models/IMenuItem";
 import { IPermissionItem } from "../models/IPermissionItem";
 import { ISharingLink } from "../models/ISharingLink";
+import GraphService from "./GraphService";
 
 export interface ISPService {
   readTeamsites(searchText: string, start: number, currentSiteUrl: string): Promise<IMenuItem[]>;
@@ -12,11 +13,13 @@ export interface ISPService {
 export class SPService implements ISPService {
   public static readonly serviceKey: ServiceKey<SPService> =
     ServiceKey.create<SPService>('react-application-nav', SPService);
+  private serviceScope: ServiceScope;
   private _spHttpClient: SPHttpClient;
   private currentSiteUrl: string;
   private pagesize: number = 15;
 
-  constructor(serviceScope: ServiceScope) {  
+  constructor(serviceScope: ServiceScope) { 
+    this.serviceScope = serviceScope; 
     serviceScope.whenFinished(() => {
       this._spHttpClient = serviceScope.consume(SPHttpClient.serviceKey);
     });
@@ -109,8 +112,8 @@ export class SPService implements ISPService {
    * This function evaluates if external sharing is enabled for the current site
    * @returns Promise<boolean> If external sharing enabled
    */
-  public async evalExternalSharingEnabled(): Promise<boolean> {
-    const requestUrl = this.currentSiteUrl + '/_api/site?$select=ShareByEmailEnabled';
+  public async evalExternalSharingEnabled(currentSiteUrl: string): Promise<boolean> {
+    const requestUrl = currentSiteUrl + '/_api/site?$select=ShareByEmailEnabled';
     return this._spHttpClient.get(requestUrl, SPHttpClient.configurations.v1)
       .then((response: SPHttpClientResponse) => {
         return response.json();
@@ -189,7 +192,7 @@ export class SPService implements ISPService {
     });
   }
 
-  public async getSharingLinks(currentSiteUrl: string): Promise<any[]> {
+  public async getSharingLinks(currentSiteUrl: string, siteId: string): Promise<ISharingLink[]> {
     let requestUrl = currentSiteUrl + `/_api/web/lists/GetByTitle('Sharing Links')`;
     const response = await this._spHttpClient.get(requestUrl, SPHttpClient.configurations.v1);
     if (response.ok) {
@@ -202,8 +205,9 @@ export class SPService implements ISPService {
         const docUrl = `${currentSiteUrl}/_layouts/15/Doc.aspx?sourcedoc={${l.SharingDocId}}`;
         sharingLinks.push({ key: lJson[0].ShareId, docId: l.SharingDocId, name: l.SharingDocId, description: lJson[0].Invitees[0].Email, roleid: lJson[0].RoleDefinitionId, url: docUrl })
       });
-      const step2SharingLinks = await this.enrichSharingLinksByRole(currentSiteUrl, sharingLinks);
-      const step3SharingLinks = await this.enrichSharingLinksByDoc(currentSiteUrl, step2SharingLinks);
+      // const step2SharingLinks = await this.enrichSharingLinksByRole(currentSiteUrl, sharingLinks);
+      // const step3SharingLinks = await this.enrichSharingLinksByDoc(currentSiteUrl, step2SharingLinks);
+      const step3SharingLinks = await this.enrichSharingLinks(siteId, sharingLinks);
       return step3SharingLinks;
     }
     else {
@@ -211,31 +215,44 @@ export class SPService implements ISPService {
     }
   }
 
-  private async enrichSharingLinksByRole(currentSiteUrl: string, sharingLinks: ISharingLink[]): Promise<ISharingLink[]> {
-    const requestUrl = currentSiteUrl + `/_api/web/roledefinitions?$select=id,name`;
-    const response = await this._spHttpClient.get(requestUrl, SPHttpClient.configurations.v1);
-    if (response.ok) {
-      const jsonResponse = await response.json();
-      sharingLinks.forEach((l) => {
-        jsonResponse.value.forEach((r: any) => {
-          if (r.Id === l.roleid) {
-            l.role = r.Name;
-          }
-        });
-      });
-    }
-    return sharingLinks;
-  }
+  // private async enrichSharingLinksByRole(currentSiteUrl: string, sharingLinks: ISharingLink[]): Promise<ISharingLink[]> {
+  //   const requestUrl = currentSiteUrl + `/_api/web/roledefinitions?$select=id,name`;
+  //   const response = await this._spHttpClient.get(requestUrl, SPHttpClient.configurations.v1);
+  //   if (response.ok) {
+  //     const jsonResponse = await response.json();
+  //     sharingLinks.forEach((l) => {
+  //       jsonResponse.value.forEach((r: any) => {
+  //         if (r.Id === l.roleid) {
+  //           l.role = r.Name;
+  //         }
+  //       });
+  //     });
+  //   }
+  //   return sharingLinks;
+  // }
 
-  public async enrichSharingLinksByDoc(currentSiteUrl: string, sharingLinks: ISharingLink[]): Promise<ISharingLink[]> {
-    // Better do with batching and PnPJS
+  // private async enrichSharingLinksByDoc(currentSiteUrl: string, sharingLinks: ISharingLink[]): Promise<ISharingLink[]> {
+  //   // Better do with batching and PnPJS
+  //   for (const l of sharingLinks) {
+  //     const requestUrl = currentSiteUrl + `/_api/web/GetFileByID('${l.docId}')?$select=Name,ServerRelativeUrl`;
+  //     const response = await this._spHttpClient.get(requestUrl, SPHttpClient.configurations.v1);
+  //     if (response.ok) {
+  //       const jsonResponse = await response.json();
+  //       l.name = jsonResponse.Name;
+  //     }
+  //   }
+  //   return sharingLinks;
+  // }
+
+  private async enrichSharingLinks(siteId: string, sharingLinks: ISharingLink[]): Promise<ISharingLink[]> {
+    // Better do with batching
+    const graphService = new GraphService(this.serviceScope);
     for (const l of sharingLinks) {
-      const requestUrl = currentSiteUrl + `/_api/web/GetFileByID('${l.docId}')?$select=Name,ServerRelativeUrl`;
-      const response = await this._spHttpClient.get(requestUrl, SPHttpClient.configurations.v1);
-      if (response.ok) {
-        const jsonResponse = await response.json();
-        l.name = jsonResponse.Name;
-      }
+      const response = await graphService.evalSharingLink(siteId, l.docId, l.key);
+      l.name = response.Name;
+      l.role = response.role;
+      l.url = response.docUrl;
+      l.shareLink = response.shareLink;
     }
     return sharingLinks;
   }

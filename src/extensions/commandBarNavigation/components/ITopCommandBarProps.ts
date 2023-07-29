@@ -3,6 +3,7 @@ import { MSGraphClientFactory } from "@microsoft/sp-http";
 
 export interface ITopCommandBarProps {
   currentSiteUrl: string;
+  siteId: string;
   serviceScope: ServiceScope;
   msGraphClientFactory: MSGraphClientFactory;
   useGraph: boolean;

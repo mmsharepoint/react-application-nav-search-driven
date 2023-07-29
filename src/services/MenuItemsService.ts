@@ -5,12 +5,12 @@ import { IMenuItem } from '../models/IMenuItem';
 import { SubMenuSites } from '../extensions/commandBarNavigation/components/subMenu/SubMenuSites';
 import { ISubMenuSitesProps } from '../extensions/commandBarNavigation/components/subMenu/ISubMenuSitesProps';
 
-const renderSubmenu = (item: any) => {
-  let element: React.ReactElement<ISubMenuSitesProps> = React.createElement(SubMenuSites, item);
+const renderSubmenu = (item: any): React.ReactElement => {
+  const element: React.ReactElement<ISubMenuSitesProps> = React.createElement(SubMenuSites, item);
   return element;
 }
 
-const dismissProjects = () => {
+const dismissProjects = (): void => {
   // What if submenu gets closed?
 }
 

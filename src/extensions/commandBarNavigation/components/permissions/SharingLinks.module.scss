@@ -1,4 +1,4 @@
-.listPermissions {
+.sharingLinks {
     .oddRow {
         background-color: "[theme: neutralQuarternary, default: #d0d0d0]";
         padding: 4px;
@@ -24,5 +24,8 @@
     }
     .txtPermission {
         margin-top: 8px;
+    }
+    .sharingBtn {
+        cursor: pointer;
     }
 }

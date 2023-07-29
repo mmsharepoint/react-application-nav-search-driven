@@ -27,61 +27,49 @@ export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
   const spService = new SPService(props.serviceScope);
   const graphService = new GraphService(props.serviceScope);
 
-  const getTeamsites = () => {
+  const getTeamsites = async (): Promise<void> => {
     if (props.useGraph) {
-      graphService.readTeamsites('', 0).then((response: IMenuItem[]) => {
-        setTeamsites(response);                   
-      });;
+      const response: IMenuItem[] = await graphService.readTeamsites('', 0);
+      setTeamsites(response);                   
     }
     else {
-      spService.readTeamsites("", 0, props.currentSiteUrl).then((response: IMenuItem[]) => {
-        setTeamsites(response);                   
-      });
+      const response: IMenuItem[] = await spService.readTeamsites("", 0, props.currentSiteUrl);
+      setTeamsites(response);
     }
   };
 
-  const getCommsites = () => {
+  const getCommsites = async (): Promise<void> => {
     if (props.useGraph) {
-      graphService.readCommsites('', 0).then((response: IMenuItem[]) => {
-        setCommsites(response);                   
-      });;
+      const response: IMenuItem[] = await graphService.readCommsites('', 0);
+      setCommsites(response);
     }
     else {
-      spService.readCommsites("", 0, props.currentSiteUrl) 
-        .then((response: IMenuItem[]) => {
-          setCommsites(response);
-        });
+      const response: IMenuItem[] = await spService.readCommsites("", 0, props.currentSiteUrl);
+      setCommsites(response);
     }    
   };
 
-  const getHubsites = () => {
-    spService.getHubSiteId(props.currentSiteUrl).then((response: string|null) => {
-      setHubsiteId(response);
-      if (props.useGraph) {
-        graphService.readHubsites('', 0).then((response: IMenuItem[]) => {
-          setHubsites(response);                   
-        });
-      }
-      else {
-        spService.readHubsites('', 0, props.currentSiteUrl).then((response: IMenuItem[]) => {
-          setHubsites(response);
-        });
-      }
-    });    
+  const getHubsites = async (): Promise<void> => {
+    const response: string|null = await spService.getHubSiteId(props.currentSiteUrl);
+    setHubsiteId(response);
+    if (props.useGraph) {
+      const response: IMenuItem[] = await graphService.readHubsites('', 0);
+      setHubsites(response);                   
+    }
+    else {
+      const response: IMenuItem[] = await spService.readHubsites('', 0, props.currentSiteUrl);
+      setHubsites(response);
+    }   
   };
 
-  const getTeams = () => { 
-    graphService.getTopTeams() 
-      .then((response: IMenuItem[]) => {
-        setTeams(response);                   
-      });        
+  const getTeams = async (): Promise<void> => { 
+    const response: IMenuItem[] = await graphService.getTopTeams();
+    setTeams(response);
   };
 
-  const evalSharing = () => {
-    spService.evalExternalSharingEnabled()
-      .then((response: boolean) => {
-        setExternalSharingEnabled(response);
-      });
+  const evalSharing = async (): Promise<void> => {
+    const response: boolean = await spService.evalExternalSharingEnabled(props.currentSiteUrl)
+    setExternalSharingEnabled(response);
   };
 
   React.useEffect((): void => {
@@ -152,7 +140,7 @@ export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
             <ListPermissions serviceScope={props.serviceScope} currentSiteUrl={props.currentSiteUrl} />
           </PivotItem>
           <PivotItem headerText="Sharing Links">
-            <SharingLinks serviceScope={props.serviceScope} currentSiteUrl={props.currentSiteUrl} />
+            <SharingLinks serviceScope={props.serviceScope} currentSiteUrl={props.currentSiteUrl} siteId={props.siteId} />
           </PivotItem>      
         </Pivot>        
       </Panel>

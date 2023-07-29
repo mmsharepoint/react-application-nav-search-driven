@@ -2,17 +2,22 @@ import * as React from "react";
 import { PrimaryButton, DefaultButton, IconButton } from '@fluentui/react/lib/Button';
 import { Dialog, DialogType, DialogFooter } from '@fluentui/react/lib/Dialog';
 import { IIconProps } from '@fluentui/react';
+import { Callout } from '@fluentui/react/lib/Callout';
 import { List } from '@fluentui/react/lib/List';
+import GraphService from "../../../../services/GraphService";
 import { SPService } from "../../../../services/SPService";
-import styles from './ListPermissions.module.scss';
+import styles from './SharingLinks.module.scss';
 import { ISharingLinksProps } from "./ISharingLinksProps";
 import { ISharingLink } from "../../../../models/ISharingLink";
 
 export const SharingLinks: React.FC<ISharingLinksProps> = (props) => {
   const [items, setItems] = React.useState<ISharingLink[]>([]);
   const spService = new SPService(props.serviceScope);
+  const graphService = new GraphService(props.serviceScope);
   const [dialog, setDialog] = React.useState<JSX.Element>();
+  const [isShareCalloutVisible, setIsShareCalloutVisible] = React.useState<boolean>(false);
   const cancelBtn: IIconProps = { iconName: 'Cancel' };
+  const shareBtn: IIconProps = { iconName: 'Share' };
   
   const dialogContentProps = {
     type: DialogType.normal,
@@ -22,46 +27,39 @@ export const SharingLinks: React.FC<ISharingLinksProps> = (props) => {
   };
 
   const getSharingLinks = () => {
-    spService.getSharingLinks(props.currentSiteUrl)
+    spService.getSharingLinks(props.currentSiteUrl, props.siteId)
       .then((respItems) => {
         setItems(respItems);
-        console.log(respItems);
-        // spService.enrichSharingLinksByDoc(props.currentSiteUrl, respItems)
-        //   .then((respItems) => {
-        //     setItems(respItems);
-        //     console.log(respItems);
-        //   });
+        console.log(respItems);        
       });
   };
 
-  const breakPermissionInheritance = (listID: string) => { 
+  const deleteSharingLink = (docId: string, shareId: string) => { 
     hideDialog();   
-    spService.breakInheritListPermissions(props.currentSiteUrl, listID).then((resp) => {
-      if (resp) {
-        getSharingLinks();
-      }
-      else {
-        // error
-      }
-    }); 
+    graphService.deleteSharingLink(props.siteId, docId, shareId);
   };
 
   const hideDialog = () => {
     setDialog(<React.Fragment></React.Fragment>);
   };
 
-  const confirmBreakPermissions = React.useCallback((listID: string) => {
-    dialogContentProps.subText = 'Do you really want to break inherited list permissions?'
+  const confirmDeleteSharingLink = React.useCallback((docId: string, shareId: string) => {
+    dialogContentProps.subText = 'Do you really want to remove the sharing link?'
     setDialog(<Dialog
               hidden={false}
               onDismiss={hideDialog}
               dialogContentProps={dialogContentProps}
             >
               <DialogFooter>
-                <PrimaryButton onClick={() => breakPermissionInheritance(listID)} text="OK" />
+                <PrimaryButton onClick={() => deleteSharingLink(docId, shareId)} text="OK" />
                 <DefaultButton onClick={hideDialog} text="Cancel" />
               </DialogFooter>
             </Dialog>);
+  }, [items]);
+
+  const copyShareLinkToClipboard = React.useCallback((shareLink: string) => {
+    navigator.clipboard.writeText(shareLink);
+    setIsShareCalloutVisible(true);
   }, [items]);
 
   const onRenderCell = (item: ISharingLink, index: number | undefined): JSX.Element => {
@@ -71,7 +69,23 @@ export const SharingLinks: React.FC<ISharingLinksProps> = (props) => {
           <div className={styles.itemName}><a href={item.url}>{item.name}</a></div>
           <div className={styles.itemPermission}>
             <span className={styles.txtPermission}>{item.role}</span>
-              <IconButton iconProps={ cancelBtn } title='Stop sharing!' onClick={ () => confirmBreakPermissions(item.key) } />
+            <span>
+              <IconButton iconProps={ shareBtn } title={item.shareLink} id={`sharing-button${item.key}`} onClick={ () => copyShareLinkToClipboard(item.shareLink!) } />
+              <IconButton iconProps={ cancelBtn } title='Stop sharing!' onClick={ () => confirmDeleteSharingLink(item.docId, item.key) } />
+              {isShareCalloutVisible && (
+                <Callout
+                  // className={styles.callout}
+                  // ariaLabelledBy={labelId}
+                  // ariaDescribedBy={descriptionId}
+                  role="dialog"
+                  gapSpace={0}
+                  target={`#sharing-button${item.key}`}
+                  onDismiss={() => setIsShareCalloutVisible(false)}
+                  setInitialFocus
+                >
+                  Sharing Link copied to clipboard!
+              </Callout>)}
+            </span>
           </div>
         </div>
       </div>
@@ -83,7 +97,7 @@ export const SharingLinks: React.FC<ISharingLinksProps> = (props) => {
   }, []);
 
   return (
-    <div className={styles.listPermissions}>
+    <div className={styles.sharingLinks}>
       <h4>Shared Files</h4>
       <List items={items} onRenderCell={onRenderCell} />
 

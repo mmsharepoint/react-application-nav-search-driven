@@ -121,4 +121,30 @@ export default class GraphService {
       return [];
     }
   }
+
+  public async evalSharingLink(siteID: string, docID: string, shareID: string): Promise<any> {
+    this.client = await this.msGraphClientFactory.getClient('3');
+    const response = await this.client
+            .api(`https://graph.microsoft.com/v1.0/sites/${siteID}/drive/items/${docID}`)
+            .expand('permissions')
+            .version('v1.0')      
+            .get();
+    console.log(response);
+    let permission: any;
+    response.permissions.forEach((p: any) => {
+      if (p.id === shareID) {
+        permission = p;
+      }
+    });
+    return { Name: response.name, docUrl: response.webUrl, role: permission.roles.join(), shareLink: permission.link.webUrl };
+  }
+
+  public async deleteSharingLink(siteID: string, docID: string, shareID: string): Promise<void> {
+    this.client = await this.msGraphClientFactory.getClient('3');
+    const response = await this.client
+            .api(`https://graph.microsoft.com/v1.0/sites/${siteID}/drive/items/${docID}/permissions/${shareID}`)
+            .version('v1.0')      
+            .delete();
+    console.log(response);
+  }
 }

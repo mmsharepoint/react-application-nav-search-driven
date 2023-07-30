@@ -6,7 +6,11 @@ This is an SPFx extension acting as a Top placeholder. It uses a FluentUi Comman
 
 Menu live in action inside a Communication site
 
-![App live in action inside Teams](assets/01MenuInAction.gif)
+![Menu live in action inside a Communication site](assets/01MenuInAction.gif)
+
+Site and list permissions in right-side panel live in action
+
+![Site and list permissions in right-side panel live in action](assets/02PermissionManagementInAction.gif)
 
 For further details see the author's [blog post](https://mmsharepoint.wordpress.com/2023/07/27/a-search-driven-navigation-with-sharepoint-framework-spfx-extension-and-fluentui/)
 
@@ -41,6 +45,15 @@ Version|Date|Author|Comments
   - **npm install**
   - **gulp serve --nobrowser**
 
+- To grant necessary MS Graph permissions for some functionality
+  - Either grant them manually (see package-solution.json which ones)
+  - Grant them via Admin center
+  - in the command-line run:
+  - **gulp bundle --ship**
+  - **gulp package-solution --ship**
+  - Upload app to app catalog
+  - Enable
+  - Grant requested permissions via API access as suggested
 - Open a SharePoint site of your choice
 - Attach the following to your site url:
   ```

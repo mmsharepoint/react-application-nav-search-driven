@@ -26,20 +26,21 @@ export const SharingLinks: React.FC<ISharingLinksProps> = (props) => {
     subText: '',
   };
 
-  const getSharingLinks = () => {
-    spService.getSharingLinks(props.currentSiteUrl, props.siteId)
-      .then((respItems) => {
-        setItems(respItems);
-        console.log(respItems);        
-      });
+  const getSharingLinks = async (): Promise<void> => {
+    const respItems = await spService.getSharingLinks(props.currentSiteUrl, props.siteId);
+    setItems(respItems);
+    console.log(respItems);
   };
 
-  const deleteSharingLink = (docId: string, shareId: string) => { 
+  const deleteSharingLink = async (docId: string, shareId: string) => { 
     hideDialog();   
-    graphService.deleteSharingLink(props.siteId, docId, shareId);
+    const response = await graphService.deleteSharingLink(props.siteId, docId, shareId);
+    if (response) {
+      getSharingLinks();
+    }
   };
 
-  const hideDialog = () => {
+  const hideDialog = (): void => {
     setDialog(<React.Fragment></React.Fragment>);
   };
 
@@ -71,12 +72,10 @@ export const SharingLinks: React.FC<ISharingLinksProps> = (props) => {
             <span className={styles.txtPermission}>{item.role}</span>
             <span>
               <IconButton iconProps={ shareBtn } title={item.shareLink} id={`sharing-button${item.key}`} onClick={ () => copyShareLinkToClipboard(item.shareLink!) } />
-              <IconButton iconProps={ cancelBtn } title='Stop sharing!' onClick={ () => confirmDeleteSharingLink(item.docId, item.key) } />
+              {props.isSiteOwner &&
+              <IconButton iconProps={ cancelBtn } title='Stop sharing!' onClick={ () => confirmDeleteSharingLink(item.docId, item.key) } />}
               {isShareCalloutVisible && (
                 <Callout
-                  // className={styles.callout}
-                  // ariaLabelledBy={labelId}
-                  // ariaDescribedBy={descriptionId}
                   role="dialog"
                   gapSpace={0}
                   target={`#sharing-button${item.key}`}

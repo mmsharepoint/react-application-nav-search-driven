@@ -43,7 +43,7 @@ export default class GraphService {
     return this.transformSearchSites(searchResponse);
   }
 
-  private async searchSites(queryText: string, start: number): Promise<any> {
+  private async searchSites(queryText: string, start: number): Promise<any[]> {
     this.client = await this.msGraphClientFactory.getClient('3');
     const requestBody = {
       requests: [
@@ -139,12 +139,13 @@ export default class GraphService {
     return { Name: response.name, docUrl: response.webUrl, role: permission.roles.join(), shareLink: permission.link.webUrl };
   }
 
-  public async deleteSharingLink(siteID: string, docID: string, shareID: string): Promise<void> {
+  public async deleteSharingLink(siteID: string, docID: string, shareID: string): Promise<boolean> {
     this.client = await this.msGraphClientFactory.getClient('3');
     const response = await this.client
             .api(`https://graph.microsoft.com/v1.0/sites/${siteID}/drive/items/${docID}/permissions/${shareID}`)
             .version('v1.0')      
             .delete();
     console.log(response);
+    return true;
   }
 }

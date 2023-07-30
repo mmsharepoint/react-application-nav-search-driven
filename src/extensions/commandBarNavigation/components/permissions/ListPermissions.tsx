@@ -22,27 +22,24 @@ export const ListPermissions: React.FC<IListPermissionsProps> = (props) => {
     subText: '',
   };
 
-  const evalListPermissions = () => {
-    spService.evalSiteListsPermInheritance(props.currentSiteUrl)
-      .then((respItems) => {
-        setItems(respItems);
-      });
-  };
-
-  const breakPermissionInheritance = (listID: string) => { 
-    hideDialog();   
-    spService.breakInheritListPermissions(props.currentSiteUrl, listID).then((resp) => {
-      if (resp) {
-        evalListPermissions();
-      }
-      else {
-        // error
-      }
-    }); 
+  const evalListPermissions = async (): Promise<void> => {
+    const respItems = await spService.evalSiteListsPermInheritance(props.currentSiteUrl);
+    setItems(respItems);
   };
 
   const hideDialog = () => {
     setDialog(<React.Fragment></React.Fragment>);
+  };
+
+  const breakPermissionInheritance = async (listID: string): Promise<void> => { 
+    hideDialog();   
+    const response = await spService.breakInheritListPermissions(props.currentSiteUrl, listID);
+    if (response) {
+      evalListPermissions();
+    }
+    else {
+      // error
+    }
   };
 
   const confirmBreakPermissions = React.useCallback((listID: string) => {
@@ -59,16 +56,15 @@ export const ListPermissions: React.FC<IListPermissionsProps> = (props) => {
             </Dialog>);
   }, [items]);
 
-  const inheritPermissions = (listID: string) => {
+  const inheritPermissions = async (listID: string): Promise<void> => {
     hideDialog();
-    spService.reInheritListPermissions(props.currentSiteUrl, listID).then((resp) => {
-      if (resp) {
-        evalListPermissions();
-      }
-      else {
-        // error
-      }
-    });
+    const response = await spService.reInheritListPermissions(props.currentSiteUrl, listID);
+    if (response) {
+      evalListPermissions();
+    }
+    else {
+      // error
+    }
   };
 
   const confirmInheritPermissions = React.useCallback((listID: string) => {
@@ -92,9 +88,9 @@ export const ListPermissions: React.FC<IListPermissionsProps> = (props) => {
           <div className={styles.itemName}><a href={item.url}>{item.name}</a></div>
           <div className={styles.itemPermission}>
             <span className={styles.txtPermission}>{item.permission}</span>
-            {item.permission === "Unique"?
+            {props.isSiteOwner && (item.permission === "Unique"?
               <IconButton iconProps={ redoBtn } title='Re-inherit permissions' onClick={ () => confirmInheritPermissions(item.key) } />:
-              <IconButton iconProps={ cancelBtn } title='Stop inherit permissions' onClick={ () => confirmBreakPermissions(item.key) } />}
+              <IconButton iconProps={ cancelBtn } title='Stop inherit permissions' onClick={ () => confirmBreakPermissions(item.key) } />)}
           </div>
         </div>
       </div>

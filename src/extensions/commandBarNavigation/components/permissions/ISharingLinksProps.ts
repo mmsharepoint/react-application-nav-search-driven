@@ -4,4 +4,5 @@ export interface ISharingLinksProps {
     currentSiteUrl: string;
     siteId: string;
     serviceScope: ServiceScope;
+    isSiteOwner: boolean;
   }

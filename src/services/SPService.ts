@@ -98,7 +98,7 @@ export class SPService implements ISPService {
         return response.json();
       })
       .then((jsonResponse: any): string|null => {
-        let hubSiteId: string = jsonResponse.value;
+        const hubSiteId: string = jsonResponse.value;
         if (hubSiteId !== '00000000-0000-0000-0000-000000000000') {
           return hubSiteId;
         }
@@ -106,7 +106,7 @@ export class SPService implements ISPService {
           return null;
         }
       });
-  };
+  }
 
   /**
    * This function evaluates if external sharing is enabled for the current site
@@ -124,22 +124,40 @@ export class SPService implements ISPService {
   }
 
   public async getSitePermissions(currentSiteUrl: string): Promise<IPermissionItem[]> {
-    this.currentSiteUrl = currentSiteUrl;
-    const requestUrl = this.currentSiteUrl + '/_api/web/roleassignments?$expand=Member/users,RoleDefinitionBindings';
+    const requestUrl = currentSiteUrl + '/_api/web/roleassignments?$expand=Member/users,RoleDefinitionBindings';
+    const defaultGroups = await this.getassociatedStdGroups(currentSiteUrl);
     return this._spHttpClient.get(requestUrl, SPHttpClient.configurations.v1)
       .then((response: SPHttpClientResponse) => {
         return response.json();
       })
       .then((jsonResponse: any) => {
-        const permissionItems: IPermissionItem[] = [];
+        const permissionItems: IPermissionItem[] = [];        
         jsonResponse.value.forEach((l: any) => {
-          permissionItems.push({ key: l.PrincipalId, name: l.Member.Title, permission: l.RoleDefinitionBindings[0].Name, description: l.RoleDefinitionBindings[0].Description, url: this.currentSiteUrl + `/_layouts/15/people.aspx?MembershipGroupId=${l.PrincipalId}` });
-        });
-        console.log(jsonResponse.value);
+          let isDefault: boolean = false;
+          defaultGroups.forEach((g) => {
+            if (g === l.PrincipalId) {
+              isDefault = true;
+            }
+          })
+          permissionItems.push({ key: l.PrincipalId, name: l.Member.Title, permission: l.RoleDefinitionBindings[0].Name, isDefault: isDefault, description: l.RoleDefinitionBindings[0].Description, url: this.currentSiteUrl + `/_layouts/15/people.aspx?MembershipGroupId=${l.PrincipalId}` });
+        });        
         return permissionItems;
       });
   }
 
+  private async getassociatedStdGroups(currentSiteUrl: string): Promise<string[]> {
+    const requestUrl = currentSiteUrl + '/_api/web?$expand=associatedOwnerGroup,associatedMemberGroup,associatedVisitorGroup';
+    const response = await this._spHttpClient.get(requestUrl, SPHttpClient.configurations.v1);
+    const principlaIds: string[] = [];
+    if (response.ok) {
+      const jsonResponse = await response.json();
+      console.log(jsonResponse);
+      principlaIds.push(jsonResponse.AssociatedOwnerGroup.Id);
+      principlaIds.push(jsonResponse.AssociatedMemberGroup.Id);
+      principlaIds.push(jsonResponse.AssociatedVisitorGroup.Id);
+    }
+    return principlaIds;
+  }
   public async evalSiteListsPermInheritance(currentSiteUrl: string): Promise<IPermissionItem[]> {
     this.currentSiteUrl = currentSiteUrl;
     const requestUrl = this.currentSiteUrl + '/_api/web/lists?$select=HasUniqueRoleAssignments,Title,Id,BaseTemplate,RootFolder/ServerRelativeUrl&$expand=RootFolder&$filter=BaseTemplate eq 101 or BaseTemplate eq 100';
@@ -150,7 +168,7 @@ export class SPService implements ISPService {
       .then((jsonResponse: any) => {
         const permissionItems: IPermissionItem[] = [];
         jsonResponse.value.forEach((l: any) => {
-          permissionItems.push({ key: l.Id, name: l.Title, permission: l.HasUniqueRoleAssignments ? 'Unique':'Inherits', description: '', url: l.RootFolder.ServerRelativeUrl });
+          permissionItems.push({ key: l.Id, name: l.Title, permission: l.HasUniqueRoleAssignments ? 'Unique':'Inherits', isDefault: false, description: '', url: l.RootFolder.ServerRelativeUrl });
         });
         return permissionItems;
       });
@@ -196,14 +214,17 @@ export class SPService implements ISPService {
     let requestUrl = currentSiteUrl + `/_api/web/lists/GetByTitle('Sharing Links')`;
     const response = await this._spHttpClient.get(requestUrl, SPHttpClient.configurations.v1);
     if (response.ok) {
-      requestUrl += `/items?$select=SharingDocId,AvailableLinks`;
+      requestUrl += `/items?$select=SharingDocId,CurrentLink,AvailableLinks`;
       const itemsResponse = await this._spHttpClient.get(requestUrl, SPHttpClient.configurations.v1);
       const itemsResponseJson = await itemsResponse.json();
       const sharingLinks: ISharingLink[] = [];
       itemsResponseJson.value.forEach((l: any) => {        
         const lJson = JSON.parse(l.AvailableLinks);
-        const docUrl = `${currentSiteUrl}/_layouts/15/Doc.aspx?sourcedoc={${l.SharingDocId}}`;
-        sharingLinks.push({ key: lJson[0].ShareId, docId: l.SharingDocId, name: l.SharingDocId, description: lJson[0].Invitees[0].Email, roleid: lJson[0].RoleDefinitionId, url: docUrl })
+        if (Array.isArray(lJson) && lJson.length > 0) {
+          const currLink = parseInt(l.CurrentLink);
+          const docUrl = `${currentSiteUrl}/_layouts/15/Doc.aspx?sourcedoc={${l.SharingDocId}}`;
+          sharingLinks.push({ key: lJson[currLink].ShareId, docId: l.SharingDocId, name: l.SharingDocId, description: lJson[currLink].Invitees[0].Email, roleid: lJson[currLink].RoleDefinitionId, url: docUrl })
+        }        
       });
       // const step2SharingLinks = await this.enrichSharingLinksByRole(currentSiteUrl, sharingLinks);
       // const step3SharingLinks = await this.enrichSharingLinksByDoc(currentSiteUrl, step2SharingLinks);

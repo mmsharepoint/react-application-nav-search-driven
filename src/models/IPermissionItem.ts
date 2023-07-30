@@ -1,12 +1,10 @@
 export interface IPermissionItem {
-    // thumbnail: string;
     key: string;
     name: string;
     description: string;
-    // color: string;
-    // shape: string;
     url: string;
     permission: string;
+    isDefault: boolean;
     width?: number;
     height?: number;
 }

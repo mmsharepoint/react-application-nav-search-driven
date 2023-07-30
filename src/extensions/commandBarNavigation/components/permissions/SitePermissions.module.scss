@@ -17,6 +17,8 @@
     .itemIndex {
         font-size: smaller;
         margin-bottom: 10;
+        display: flex;
+        justify-content: space-between;
         color: "[theme: neutralSecondary, default: #666666]";
     }
 }

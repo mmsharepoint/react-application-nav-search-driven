@@ -11,4 +11,5 @@ export interface ITopCommandBarProps {
   useCommsites: boolean;
   useHubsites: boolean;
   useTeams: boolean;
+  isSiteOwner: boolean;
 }

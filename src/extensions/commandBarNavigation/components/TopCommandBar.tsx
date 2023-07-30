@@ -134,13 +134,13 @@ export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
               'data-title': 'My Files Title',
             }}
           >
-            <SitePermissions serviceScope={props.serviceScope} currentSiteUrl={props.currentSiteUrl} />
+            <SitePermissions serviceScope={props.serviceScope} currentSiteUrl={props.currentSiteUrl} isSiteOwner={props.isSiteOwner} />
           </PivotItem>
           <PivotItem headerText="Lists">
-            <ListPermissions serviceScope={props.serviceScope} currentSiteUrl={props.currentSiteUrl} />
+            <ListPermissions serviceScope={props.serviceScope} currentSiteUrl={props.currentSiteUrl} isSiteOwner={props.isSiteOwner} />
           </PivotItem>
           <PivotItem headerText="Sharing Links">
-            <SharingLinks serviceScope={props.serviceScope} currentSiteUrl={props.currentSiteUrl} siteId={props.siteId} />
+            <SharingLinks serviceScope={props.serviceScope} currentSiteUrl={props.currentSiteUrl} siteId={props.siteId} isSiteOwner={props.isSiteOwner} />
           </PivotItem>      
         </Pivot>        
       </Panel>

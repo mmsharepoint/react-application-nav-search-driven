@@ -6,6 +6,7 @@ import {
   PlaceholderContent,
   PlaceholderName
 } from '@microsoft/sp-application-base';
+import { SPPermission } from '@microsoft/sp-page-context';
 import { ITopCommandBarProps } from './components/ITopCommandBarProps';
 import { TopCommandBar } from './components/TopCommandBar';
 
@@ -18,15 +19,9 @@ const LOG_SOURCE: string = 'CommandBarNavigationApplicationCustomizer';
  */
 export interface ICommandBarNavigationApplicationCustomizerProperties {
   useTeamsites: boolean;
-  // teamSitesMoreUrl: string;
   useCommsites: boolean;
-  // commSitesMoreUrl: string;
-  // useClassicsites: boolean;
-  // classicSitesMoreUrl: string;
   useHubsites: boolean;
-  // hubSitesMoreUrl: string;
   useTeams: boolean;
-  // teamsMoreUrl: string;
   useGraph: boolean;
 }
 
@@ -52,7 +47,7 @@ export default class CommandBarNavigationApplicationCustomizer
       if (!this._topPlaceholder) {
         console.error('The expected placeholder was not found!');
       }
-      // Default handling config properties. ToDo: WHERE BETTER?
+      // Default handling config properties.
       if (typeof this.properties.useTeamsites !== 'boolean') {
         this.properties.useTeamsites = true;
       }
@@ -65,6 +60,7 @@ export default class CommandBarNavigationApplicationCustomizer
       if (typeof this.properties.useTeams !== 'boolean') {
         this.properties.useTeams = true;
       }
+      const isSiteOwner = this.context.pageContext.web.permissions.hasAllPermissions(SPPermission.manageWeb, SPPermission.managePermissions);          
       if (this._topPlaceholder && this._topPlaceholder.domElement) {
         const element: React.ReactElement<ITopCommandBarProps> = React.createElement(
           TopCommandBar,
@@ -76,14 +72,9 @@ export default class CommandBarNavigationApplicationCustomizer
             useGraph: this.properties.useGraph,
             useTeamsites: this.properties.useTeamsites,
             useCommsites: this.properties.useCommsites,
-            // useClassicsites: this.properties.useClassicsites,
             useHubsites: this.properties.useHubsites,
             useTeams: this.properties.useTeams,
-            // teamSitesMoreUrl: this.properties.teamSitesMoreUrl,
-            // commSitesMoreUrl: this.properties.commSitesMoreUrl,
-            // classicSitesMoreUrl: this.properties.classicSitesMoreUrl,  
-            // hubSitesMoreUrl: this.properties.hubSitesMoreUrl,
-            // teamsMoreUrl: this.properties.teamsMoreUrl
+            isSiteOwner: isSiteOwner
           }
         );
         ReactDom.render(element, this._topPlaceholder.domElement); 

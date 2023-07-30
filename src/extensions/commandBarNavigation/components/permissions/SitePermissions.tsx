@@ -1,5 +1,6 @@
 import * as React from "react";
-import { IconButton } from '@fluentui/react/lib/Button';
+import { DefaultButton, PrimaryButton, IconButton } from '@fluentui/react/lib/Button';
+import { Dialog, DialogType, DialogFooter } from '@fluentui/react/lib/Dialog';
 import { List } from '@fluentui/react/lib/List';
 import { IIconProps } from '@fluentui/react';
 import { SPService } from "../../../../services/SPService";
@@ -9,13 +10,47 @@ import { ISitePermissionsProps } from "./ISitePermissionsProps";
 
 export const SitePermissions: React.FC<ISitePermissionsProps> = (props) => {
   const [items, setItems] = React.useState<IPermissionItem[]>([]);
+  const [dialog, setDialog] = React.useState<JSX.Element>();
   const cancelBtn: IIconProps = { iconName: 'Cancel' };
   const spService = new SPService(props.serviceScope);
   
+  const dialogContentProps = {
+    type: DialogType.normal,
+    title: 'Confirm Permission Change',
+    closeButtonAriaLabel: 'Close',
+    subText: '',
+  };
+
   const evalSitePermissions = async (): Promise<void> => {
     const respItems = await spService.getSitePermissions(props.currentSiteUrl);        
     setItems(respItems);
   };
+
+  const deletePermission = async (principalId: string) => { 
+    hideDialog();   
+    const response = await spService.removeSitePermission(props.currentSiteUrl, principalId);
+    if (response) {
+      evalSitePermissions();
+    }
+  };
+
+  const hideDialog = (): void => {
+    setDialog(<React.Fragment></React.Fragment>);
+  };
+
+  const confirmDeletePermission = React.useCallback((principalId: string) => {
+    dialogContentProps.subText = 'Do you really want to remove the sharing link?'
+    setDialog(<Dialog
+              hidden={false}
+              onDismiss={hideDialog}
+              dialogContentProps={dialogContentProps}
+            >
+              <DialogFooter>
+                <PrimaryButton onClick={() => deletePermission(principalId)} text="OK" />
+                <DefaultButton onClick={hideDialog} text="Cancel" />
+              </DialogFooter>
+            </Dialog>);
+  }, [items]);
 
   const onRenderCell = (item: IPermissionItem, index: number): JSX.Element => {
     return (
@@ -26,7 +61,7 @@ export const SitePermissions: React.FC<ISitePermissionsProps> = (props) => {
             <span>{item.permission}</span>
             {!item.isDefault && props.isSiteOwner &&
             <span>
-              <IconButton iconProps={ cancelBtn } title='Remove permission'  />
+              <IconButton iconProps={ cancelBtn } title='Remove permission' onClick={ () => confirmDeletePermission(item.key) } />
             </span>}
           </div>
         </div>
@@ -42,6 +77,8 @@ export const SitePermissions: React.FC<ISitePermissionsProps> = (props) => {
     <div className={styles.sitePermissions}>
       <h4>Site</h4>
       <List items={items} onRenderCell={onRenderCell} />
+
+      {dialog}
     </div>
   )
 }

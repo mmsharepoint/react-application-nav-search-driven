@@ -145,6 +145,27 @@ export class SPService implements ISPService {
       });
   }
 
+  public async removeSitePermission(currentSiteUrl: string, principalId: string): Promise<boolean> {
+    const requestUrl = currentSiteUrl + `/_api/web/roleassignments/getbyprincipalid(${principalId})`;
+    const response = await this._spHttpClient.post(requestUrl, 
+      SPHttpClient.configurations.v1,
+      {  
+        headers: {  
+          'Accept': 'application/json;odata=nometadata',  
+          'Content-type': 'application/json;odata=verbose',  
+          'odata-version': '',  
+          'IF-MATCH': '*',  
+          'X-HTTP-Method': 'DELETE'  
+        }  
+      });
+    if (response.ok) {
+      return true;
+    }
+    else {
+      return false;
+    }    
+  }
+
   private async getassociatedStdGroups(currentSiteUrl: string): Promise<string[]> {
     const requestUrl = currentSiteUrl + '/_api/web?$expand=associatedOwnerGroup,associatedMemberGroup,associatedVisitorGroup';
     const response = await this._spHttpClient.get(requestUrl, SPHttpClient.configurations.v1);

@@ -29,7 +29,6 @@ export const SharingLinks: React.FC<ISharingLinksProps> = (props) => {
   const getSharingLinks = async (): Promise<void> => {
     const respItems = await spService.getSharingLinks(props.currentSiteUrl, props.siteId);
     setItems(respItems);
-    console.log(respItems);
   };
 
   const deleteSharingLink = async (docId: string, shareId: string) => { 
@@ -68,6 +67,7 @@ export const SharingLinks: React.FC<ISharingLinksProps> = (props) => {
       <div data-is-focusable={true}>       
         <div className={index! % 2 === 0 ? styles.evenRow : styles.oddRow}>
           <div className={styles.itemName}><a href={item.url}>{item.name}</a></div>
+          <div className={styles.itemPerson}>{item.description}</div>
           <div className={styles.itemPermission}>
             <span className={styles.txtPermission}>{item.role}</span>
             <span>

@@ -172,7 +172,6 @@ export class SPService implements ISPService {
     const principlaIds: string[] = [];
     if (response.ok) {
       const jsonResponse = await response.json();
-      console.log(jsonResponse);
       principlaIds.push(jsonResponse.AssociatedOwnerGroup.Id);
       principlaIds.push(jsonResponse.AssociatedMemberGroup.Id);
       principlaIds.push(jsonResponse.AssociatedVisitorGroup.Id);
@@ -244,58 +243,19 @@ export class SPService implements ISPService {
         if (Array.isArray(lJson) && lJson.length > 0) {
           const currLink = parseInt(l.CurrentLink);
           const docUrl = `${currentSiteUrl}/_layouts/15/Doc.aspx?sourcedoc={${l.SharingDocId}}`;
-          sharingLinks.push({ key: lJson[currLink].ShareId, docId: l.SharingDocId, name: l.SharingDocId, description: lJson[currLink].Invitees[0].Email, roleid: lJson[currLink].RoleDefinitionId, url: docUrl })
+          const emails: string[] = [];
+          lJson[currLink].Invitees.forEach((i: any) => emails.push(i.Email));
+          sharingLinks.push({ key: lJson[currLink].ShareId, docId: l.SharingDocId, name: l.SharingDocId, description: emails.join(), roleid: lJson[currLink].RoleDefinitionId, url: docUrl })
         }        
-      });
-      // const step2SharingLinks = await this.enrichSharingLinksByRole(currentSiteUrl, sharingLinks);
-      // const step3SharingLinks = await this.enrichSharingLinksByDoc(currentSiteUrl, step2SharingLinks);
-      const step3SharingLinks = await this.enrichSharingLinks(siteId, sharingLinks);
-      return step3SharingLinks;
+      });      
+      const graphService = new GraphService(this.serviceScope);
+      // Sample assumption: sharingLinks <= 20 
+      // Otherwise page, as Graph batching only supports up to 20 requests per batch
+      const enrichedSharingLinks = await graphService.evalSharingLinks(siteId, sharingLinks);
+      return enrichedSharingLinks;
     }
     else {
       return []; // List not created yet, so nothing shared, yet
     }
-  }
-
-  // private async enrichSharingLinksByRole(currentSiteUrl: string, sharingLinks: ISharingLink[]): Promise<ISharingLink[]> {
-  //   const requestUrl = currentSiteUrl + `/_api/web/roledefinitions?$select=id,name`;
-  //   const response = await this._spHttpClient.get(requestUrl, SPHttpClient.configurations.v1);
-  //   if (response.ok) {
-  //     const jsonResponse = await response.json();
-  //     sharingLinks.forEach((l) => {
-  //       jsonResponse.value.forEach((r: any) => {
-  //         if (r.Id === l.roleid) {
-  //           l.role = r.Name;
-  //         }
-  //       });
-  //     });
-  //   }
-  //   return sharingLinks;
-  // }
-
-  // private async enrichSharingLinksByDoc(currentSiteUrl: string, sharingLinks: ISharingLink[]): Promise<ISharingLink[]> {
-  //   // Better do with batching and PnPJS
-  //   for (const l of sharingLinks) {
-  //     const requestUrl = currentSiteUrl + `/_api/web/GetFileByID('${l.docId}')?$select=Name,ServerRelativeUrl`;
-  //     const response = await this._spHttpClient.get(requestUrl, SPHttpClient.configurations.v1);
-  //     if (response.ok) {
-  //       const jsonResponse = await response.json();
-  //       l.name = jsonResponse.Name;
-  //     }
-  //   }
-  //   return sharingLinks;
-  // }
-
-  private async enrichSharingLinks(siteId: string, sharingLinks: ISharingLink[]): Promise<ISharingLink[]> {
-    // Better do with batching
-    const graphService = new GraphService(this.serviceScope);
-    for (const l of sharingLinks) {
-      const response = await graphService.evalSharingLink(siteId, l.docId, l.key);
-      l.name = response.Name;
-      l.role = response.role;
-      l.url = response.docUrl;
-      l.shareLink = response.shareLink;
-    }
-    return sharingLinks;
   }
 }

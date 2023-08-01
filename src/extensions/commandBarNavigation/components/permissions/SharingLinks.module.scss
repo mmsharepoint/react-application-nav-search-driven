@@ -16,6 +16,10 @@
             color: "[theme: neutralPrimary, default: #333333]";
         }        
     }
+    .itemPerson {
+        font-size: x-small;
+        color: "[theme: neutralSecondary, default: #666666]";  
+    }
     .itemPermission {
         font-size: smaller;
         display: flex;

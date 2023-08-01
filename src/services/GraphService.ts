@@ -1,7 +1,18 @@
 import { ServiceKey, ServiceScope } from "@microsoft/sp-core-library";
-import { MSGraphClientFactory, MSGraphClientV3 } from "@microsoft/sp-http";
+import { MSGraphClientFactory, MSGraphClientV3,  } from "@microsoft/sp-http";
 import { ITeam } from "../models/ITeam";
 import { IMenuItem } from "../models/IMenuItem";
+import { ISharingLink } from "../models/ISharingLink";
+
+interface IGraphBatchRequest {
+  id: string;
+  method: string;
+  url: string;
+}
+
+interface IGraphBatchBody {
+  requests: IGraphBatchRequest[];
+}
 
 export default class GraphService {
 	private msGraphClientFactory: MSGraphClientFactory;
@@ -122,21 +133,33 @@ export default class GraphService {
     }
   }
 
-  public async evalSharingLink(siteID: string, docID: string, shareID: string): Promise<any> {
+  public async evalSharingLinks(siteID: string, sharingLinks: ISharingLink[]): Promise<ISharingLink[]> {
     this.client = await this.msGraphClientFactory.getClient('3');
+    let body: IGraphBatchBody = { requests: [] };
+    sharingLinks.forEach((l, index) => {
+      const requestUrl = `/sites/${siteID}/drive/items/${l.docId}?$expand=permissions`;
+      body.requests.push({ id: index.toString(), url: requestUrl, method: 'GET' });
+    });
     const response = await this.client
-            .api(`https://graph.microsoft.com/v1.0/sites/${siteID}/drive/items/${docID}`)
-            .expand('permissions')
-            .version('v1.0')      
-            .get();
-    console.log(response);
-    let permission: any;
-    response.permissions.forEach((p: any) => {
-      if (p.id === shareID) {
-        permission = p;
+      .api('$batch')
+      .version('v1.0')
+      .post(body);
+    response.responses.forEach((docResponse: any) => {
+      if (docResponse.status === 200) {
+        const respId = parseInt(docResponse.id); 
+        sharingLinks[respId].name = docResponse.body.name;
+        sharingLinks[respId].url = docResponse.body.webUrl;
+        let permission: any;
+        docResponse.body.permissions.forEach((p: any) => {
+          if (p.id === sharingLinks[respId].key) {
+            permission = p;
+          }
+        });
+        sharingLinks[respId].role = permission.roles.join();
+        sharingLinks[respId].shareLink = permission.link.webUrl;
       }
     });
-    return { Name: response.name, docUrl: response.webUrl, role: permission.roles.join(), shareLink: permission.link.webUrl };
+    return sharingLinks;
   }
 
   public async deleteSharingLink(siteID: string, docID: string, shareID: string): Promise<boolean> {

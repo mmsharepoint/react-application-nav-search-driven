@@ -57,8 +57,8 @@ const teamSitesItem: ICommandBarItemProps = {
     },
     subMenuProps: {
       items: [{
-        key: 'ProjectSub',
-        name: 'ProjectSub', 
+        key: 'CommSub',
+        name: 'CommSub', 
         label: 'Modern Communication Sites',       
         dataItems: [],
         //searchCallback: this.searchCommSites.bind(this),
@@ -143,12 +143,18 @@ const teamSitesItem: ICommandBarItemProps = {
                                         myTeams: IMenuItem[],
                                         homesite: any,
                                         useTeamsites: boolean,
+                                        searchTeamSites: (text: string) => void,
                                         useCommsites: boolean,
+                                        searchCommSites: (text: string) => void,
                                         useHubsites: boolean,
+                                        searchHubSites: (text: string) => void,
                                         useTeams: boolean): ICommandBarItemProps[] => {    
     teamSitesItem.subMenuProps!.items[0].dataItems = teamsites;
+    teamSitesItem.subMenuProps!.items[0].searchCallback = searchTeamSites;
     commSitesItem.subMenuProps!.items[0].dataItems = commsites;
+    commSitesItem.subMenuProps!.items[0].searchCallback = searchCommSites;
     hubSitesItem.subMenuProps!.items[0].dataItems = hubsites;
+    hubSitesItem.subMenuProps!.items[0].searchCallback = searchHubSites;
     myTeamsItem.subMenuProps!.items[0].dataItems = myTeams;
     const commandBarItems: ICommandBarItemProps[] = [];
     if (useHubsites && homesite !== null) {

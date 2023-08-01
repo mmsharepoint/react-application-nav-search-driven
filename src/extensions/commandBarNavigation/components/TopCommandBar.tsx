@@ -27,39 +27,72 @@ export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
   const spService = new SPService(props.serviceScope);
   const graphService = new GraphService(props.serviceScope);
 
-  const getTeamsites = async (): Promise<void> => {
+  /**
+   * This functions retrieves items and returns them to calling function
+   * Calling function can be inside this or another calling Submenu component
+   * @param searchText: string
+   * @returns IMenuItem[]
+   */
+  const readTeamsites = async (searchText: string): Promise<IMenuItem[]> => {
     if (props.useGraph) {
-      const response: IMenuItem[] = await graphService.readTeamsites('', 0);
-      setTeamsites(response);                   
+      const response: IMenuItem[] = await graphService.readTeamsites(searchText, 0);
+      return response;                  
     }
     else {
-      const response: IMenuItem[] = await spService.readTeamsites("", 0, props.currentSiteUrl);
-      setTeamsites(response);
+      const response: IMenuItem[] = await spService.readTeamsites(searchText, 0, props.currentSiteUrl);
+      return response;
     }
   };
 
-  const getCommsites = async (): Promise<void> => {
+  const getTeamsites = async (searchText: string): Promise<void> => {
+    const items = await readTeamsites(searchText);
+    setTeamsites(items);
+  }
+
+  /**
+   * This functions retrieves items and returns them to calling function
+   * Calling function can be inside this or another calling Submenu component
+   * @param searchText: string
+   * @returns IMenuItem[]
+   */
+  const readCommsites = async (searchText: string): Promise<IMenuItem[]> => {
     if (props.useGraph) {
-      const response: IMenuItem[] = await graphService.readCommsites('', 0);
-      setCommsites(response);
+      const response: IMenuItem[] = await graphService.readCommsites(searchText, 0);
+      return response;
     }
     else {
-      const response: IMenuItem[] = await spService.readCommsites("", 0, props.currentSiteUrl);
-      setCommsites(response);
-    }    
+      const response: IMenuItem[] = await spService.readCommsites('', 0, props.currentSiteUrl);
+      return response;
+    }
+  }
+
+  const getCommsites = async (searchText: string): Promise<void> => {
+    const items = await readCommsites(searchText);
+    setCommsites(items);
   };
 
-  const getHubsites = async (): Promise<void> => {
+  /**
+   * This functions retrieves items and returns them to calling function
+   * Calling function can be inside this or another calling Submenu component
+   * @param searchText: string
+   * @returns IMenuItem[]
+   */
+  const readHubsites = async (searchText: string): Promise<IMenuItem[]> => {
     const response: string|null = await spService.getHubSiteId(props.currentSiteUrl);
     setHubsiteId(response);
     if (props.useGraph) {
-      const response: IMenuItem[] = await graphService.readHubsites('', 0);
-      setHubsites(response);                   
+      const response: IMenuItem[] = await graphService.readHubsites(searchText, 0);
+      return response;               
     }
     else {
-      const response: IMenuItem[] = await spService.readHubsites('', 0, props.currentSiteUrl);
-      setHubsites(response);
+      const response: IMenuItem[] = await spService.readHubsites(searchText, 0, props.currentSiteUrl);
+      return response;
     }   
+  };
+
+  const getHubsites = async (searchText: string): Promise<void> => {
+    const response: IMenuItem[] = await readHubsites(searchText);
+    setHubsites(response);
   };
 
   const getTeams = async (): Promise<void> => { 
@@ -73,7 +106,7 @@ export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
   };
 
   React.useEffect((): void => {
-    const renderedItems = evaluateCommandItems(teamsites, commsites, hubites, teams, homesite, props.useTeamsites, props.useCommsites, props.useHubsites, props.useTeams);
+    const renderedItems = evaluateCommandItems(teamsites, commsites, hubites, teams, homesite, props.useTeamsites, readTeamsites, props.useCommsites, readCommsites, props.useHubsites, readHubsites, props.useTeams);
     setCommandItems(renderedItems);    
   }, [teamsites, commsites, hubites, teams, homesite]);
 
@@ -95,13 +128,13 @@ export const TopCommandBar: React.FC<ITopCommandBarProps> = (props) => {
 
   React.useEffect((): void => {
     if (props.useTeamsites) {
-      getTeamsites();
+      getTeamsites('');
     }
     if (props.useCommsites) {
-      getCommsites();
+      getCommsites('');
     }
     if (props.useHubsites) {
-      getHubsites();
+      getHubsites('');
     }
     if (props.useTeams) {
       getTeams();

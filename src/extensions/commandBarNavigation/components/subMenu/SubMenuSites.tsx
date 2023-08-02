@@ -46,9 +46,9 @@ export const SubMenuSites: React.FC<ISubMenuSitesProps> = (props) => {
    */
   const handleSearchTextChange = React.useCallback((event, newValue: string) => {
     specialSearchChars.forEach((char) => {
-      let regPatt:RegExp = new RegExp(char,'gi');
+      const regPatt:RegExp = new RegExp(char,'gi');
       while (regPatt.exec(newValue)){
-        newValue = newValue.substr(0, regPatt.lastIndex - 1) + newValue.substr(regPatt.lastIndex , newValue.length);        
+        newValue = newValue.substring(0, regPatt.lastIndex - 1) + newValue.substring(regPatt.lastIndex , newValue.length);
       }
       setSearchInputText(newValue);
     });

@@ -39,7 +39,7 @@ export const SitePermissions: React.FC<ISitePermissionsProps> = (props) => {
   };
 
   const confirmDeletePermission = React.useCallback((principalId: string) => {
-    dialogContentProps.subText = 'Do you really want to remove the sharing link?'
+    dialogContentProps.subText = 'Do you really want to remove the site permission?'
     setDialog(<Dialog
               hidden={false}
               onDismiss={hideDialog}

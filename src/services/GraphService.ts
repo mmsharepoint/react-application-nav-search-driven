@@ -109,7 +109,7 @@ export default class GraphService {
             .version('v1.0')
             .top(20)   // Limit in batching!      
             .get();
-    let teams: Array<ITeam> = new Array<ITeam>();
+    const teams: Array<ITeam> = new Array<ITeam>();
     response.value.forEach((item: ITeam|any) => {
       teams.push({ id: item.id, displayName: item.displayName, description: item.description, mailNickname: item.mailNickname, visibility: '', url: `/teams/${item.mailNickname}`, photo: '', members: item.members.length, createdDateTime: '', teamUrl: '', owners: []});
     });      
@@ -135,7 +135,7 @@ export default class GraphService {
 
   public async evalSharingLinks(siteID: string, sharingLinks: ISharingLink[]): Promise<ISharingLink[]> {
     this.client = await this.msGraphClientFactory.getClient('3');
-    let body: IGraphBatchBody = { requests: [] };
+    const body: IGraphBatchBody = { requests: [] };
     sharingLinks.forEach((l, index) => {
       const requestUrl = `/sites/${siteID}/drive/items/${l.docId}?$expand=permissions`;
       body.requests.push({ id: index.toString(), url: requestUrl, method: 'GET' });

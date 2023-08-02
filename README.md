@@ -12,7 +12,11 @@ Site and list permissions in right-side panel live in action
 
 ![Site and list permissions in right-side panel live in action](assets/02PermissionManagementInAction.gif)
 
-For further details see the author's [blog post](https://mmsharepoint.wordpress.com/2023/07/27/a-search-driven-navigation-with-sharepoint-framework-spfx-extension-and-fluentui/)
+External Sharing and Sharing Links in right-side panel live in action
+
+![External Sharing and Sharing Links in right-side panel live in action](assets/04ExternalSharingInAction.gif)
+
+For further details see the author's [blog series](https://mmsharepoint.wordpress.com/2023/07/27/a-search-driven-navigation-with-sharepoint-framework-spfx-extension-and-fluentui/)
 
 ## Used SharePoint Framework Version
 
@@ -64,9 +68,12 @@ Version|Date|Author|Comments
 
 ## Features
 
+* [Create a SharePoint framework extension application placeholder](https://learn.microsoft.com/en-us/sharepoint/dev/spfx/extensions/get-started/using-page-placeholder-with-extensions?WT.mc_id=M365-MVP-5004617)
 * [Use the MSGraphClientV3 to connect to Microsoft Graph](https://learn.microsoft.com/en-us/sharepoint/dev/spfx/use-msgraph?WT.mc_id=M365-MVP-5004617)
   * [Use the Microsoft Search API to query data](https://learn.microsoft.com/en-us/graph/api/resources/search-api-overview?view=graph-rest-1.0&WT.mc_id=M365-MVP-5004617)
-* [Use FluentUI CommandBar, ContextualMenu, Dialog, List, Panel, PersonaInitialsColor, Pivot, TextField](https://developer.microsoft.com/en-us/fluentui#/?WT.mc_id=M365-MVP-5004617)
+  * [Use Microsoft Graph API to handle sharing links](https://learn.microsoft.com/en-us/graph/api/shares-get?view=graph-rest-1.0&tabs=http&WT.mc_id=M365-MVP-5004617)
+* [Use FluentUI CommandBar, ContextualMenu, Dialog, List, Panel, PersonaInitialsColor, Pivot, TextField (incl 'Clear' icon)](https://developer.microsoft.com/en-us/fluentui#/?WT.mc_id=M365-MVP-5004617)
+* [Use SharePoint Rest API to work with permissions](https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/set-custom-permissions-on-a-list-by-using-the-rest-interface?WT.mc_id=M365-MVP-5004617)
 
 ## References
 

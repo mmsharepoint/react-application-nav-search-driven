@@ -18,6 +18,22 @@ External Sharing and Sharing Links in right-side panel live in action
 
 For further details see the author's [blog series](https://mmsharepoint.wordpress.com/2023/07/27/a-search-driven-navigation-with-sharepoint-framework-spfx-extension-and-fluentui/)
 
+
+## Compatibility
+
+![SPFx 1.18.2](https://img.shields.io/badge/SPFx-1.17.4-green.svg)
+![Node.js v18](https://img.shields.io/badge/Node.js-v18-green.svg)
+![Compatible with SharePoint Online](https://img.shields.io/badge/SharePoint%20Online-Compatible-green.svg)
+![Does not work with SharePoint 2019](https://img.shields.io/badge/SharePoint%20Server%202019-Incompatible-red.svg "SharePoint Server 2019 requires SPFx 1.4.1 or lower")
+![Does not work with SharePoint 2016 (Feature Pack 2)](https://img.shields.io/badge/SharePoint%20Server%202016%20(Feature%20Pack%202)-Incompatible-red.svg "SharePoint Server 2016 Feature Pack 2 requires SPFx 1.1")
+![Local Workbench Unsupported](https://img.shields.io/badge/Local%20Workbench-Unsupported-red.svg "Local workbench is no longer available as of SPFx 1.13 and above")
+![Hosted Workbench compatible](https://img.shields.io/badge/Hosted%20Workbench-compatible-green.svg "Does work with hosted workbench")
+
+Tested with Node version:v16.13.2 and SPFx 1.17.4 (previous version)
+
+Tested with Node version:v18.18.2 and SPFx 1.18.2 (current version)
+
+
 ## Used SharePoint Framework Version
 
 ![version](https://img.shields.io/badge/version-1.18.2-green.svg)
@@ -34,7 +50,7 @@ For further details see the author's [blog series](https://mmsharepoint.wordpres
 Version|Date|Author|Comments
 -------|----|----|--------
 0.1|Jul 27, 2023|[Markus Moeller](https://twitter.com/moeller2_0)|Initial release
-1.0|Jul 27, 2023|[Markus Moeller](https://twitter.com/moeller2_0)|Initial release
+1.0|Aug 11, 2023|[Markus Moeller](https://twitter.com/moeller2_0)|Public release
 1.1|Jan 20, 2024|[Markus Moeller](https://twitter.com/moeller2_0)|Upgraded to SPFx 1.18.2
 
 ## Disclaimer

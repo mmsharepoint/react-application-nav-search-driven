@@ -20,7 +20,7 @@ For further details see the author's [blog series](https://mmsharepoint.wordpres
 
 ## Used SharePoint Framework Version
 
-![version](https://img.shields.io/badge/version-1.17.4-green.svg)
+![version](https://img.shields.io/badge/version-1.18.2-green.svg)
 
 ## Applies to
 
@@ -34,6 +34,8 @@ For further details see the author's [blog series](https://mmsharepoint.wordpres
 Version|Date|Author|Comments
 -------|----|----|--------
 0.1|Jul 27, 2023|[Markus Moeller](https://twitter.com/moeller2_0)|Initial release
+1.0|Jul 27, 2023|[Markus Moeller](https://twitter.com/moeller2_0)|Initial release
+1.1|Jan 20, 2024|[Markus Moeller](https://twitter.com/moeller2_0)|Upgraded to SPFx 1.18.2
 
 ## Disclaimer
 
